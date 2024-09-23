@@ -12,7 +12,7 @@ import java.io.IOException;
  * 手写Sring
  */
 @Configuration
-@ComponentScan("org.af")
+@ComponentScan("com.af")
 public class RunSpringDemo {
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
