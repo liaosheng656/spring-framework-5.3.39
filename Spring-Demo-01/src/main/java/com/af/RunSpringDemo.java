@@ -7,23 +7,22 @@ import java.io.IOException;
 
 //@Configuration
 /**
- * 手写Sring
+ * ��дSring
  */
-//@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)//CGLIB代理
+//@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)//CGLIB����
 @Configuration
 @ComponentScan("com.af")
 public class RunSpringDemo {
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 
-		//创建容器对象
+		//������������
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(RunSpringDemo.class);
 //		context.getBean("");
-		//创建bean
+		//����bean
 //		RunSpringServiceDemo bean = context.getBeanFactory().createBean(RunSpringServiceDemo.class);
 //		AFAnnotationConfigApplicationContext context = new AFAnnotationConfigApplicationContext(RunSpringDemo.class);
-		System.out.println("执行完了-----2222");
-
+		System.out.println("finish-333333");
 	}
 
 }

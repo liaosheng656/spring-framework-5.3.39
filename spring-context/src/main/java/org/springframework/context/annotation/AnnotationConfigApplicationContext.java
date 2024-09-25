@@ -93,7 +93,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
 		//开始加载-注册一些默认的后置处理器（bean定义）和一些解析器，添加一下默认的扫描器，加上@Component过滤
 		this();
-		logger.info("开始注册"+componentClasses.getClass().getName()+"类-bean定义及设置一些bean定义的属性，比如代理");
+		String str = "开始注册"+(componentClasses.getClass().getName())+"类-bean定义及设置一些bean定义的属性，比如代理";
+		logger.info(str);
 		//注册componentClasses类-bean定义及设置一些bean定义的属性，比如代理
 		register(componentClasses);
 		logger.info("来到重头戏份refresh()");
