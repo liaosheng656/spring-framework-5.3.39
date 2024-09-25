@@ -110,6 +110,8 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * Create a new GenericApplicationContext.
 	 * @see #registerBeanDefinition
 	 * @see #refresh
+	 * 设置一个beanFactory，DefaultListableBeanFactory是功能最齐全的
+	 * Ctrl+Alt+U 可以看类继承关系
 	 */
 	public GenericApplicationContext() {
 		this.beanFactory = new DefaultListableBeanFactory();

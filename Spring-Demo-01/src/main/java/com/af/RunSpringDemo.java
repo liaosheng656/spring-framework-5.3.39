@@ -1,9 +1,7 @@
 package com.af;
 
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
 
 import java.io.IOException;
 
@@ -11,6 +9,7 @@ import java.io.IOException;
 /**
  * 手写Sring
  */
+//@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)//CGLIB代理
 @Configuration
 @ComponentScan("com.af")
 public class RunSpringDemo {

@@ -66,8 +66,10 @@ public class AnnotatedBeanDefinitionReader {
 	 * in the form of a {@code BeanDefinitionRegistry}
 	 * @see #AnnotatedBeanDefinitionReader(BeanDefinitionRegistry, Environment)
 	 * @see #setEnvironment(Environment)
+	 * 注册一下默认的后置处理器（bean定义）和一些解析器
 	 */
 	public AnnotatedBeanDefinitionReader(BeanDefinitionRegistry registry) {
+		//注册一下默认的后置处理器（bean定义）和一些解析器
 		this(registry, getOrCreateEnvironment(registry));
 	}
 
@@ -79,6 +81,7 @@ public class AnnotatedBeanDefinitionReader {
 	 * @param environment the {@code Environment} to use when evaluating bean definition
 	 * profiles.
 	 * @since 3.1
+	 * 注册一下默认的后置处理器（bean定义）和一些解析器
 	 */
 	public AnnotatedBeanDefinitionReader(BeanDefinitionRegistry registry, Environment environment) {
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
@@ -134,6 +137,7 @@ public class AnnotatedBeanDefinitionReader {
 	 */
 	public void register(Class<?>... componentClasses) {
 		for (Class<?> componentClass : componentClasses) {
+			//注册bean定义及设置一些bean定义的属性，比如代理
 			registerBean(componentClass);
 		}
 	}
@@ -144,6 +148,7 @@ public class AnnotatedBeanDefinitionReader {
 	 * @param beanClass the class of the bean
 	 */
 	public void registerBean(Class<?> beanClass) {
+		//注册bean定义及设置一些bean定义的属性，比如代理
 		doRegisterBean(beanClass, null, null, null, null);
 	}
 
@@ -256,6 +261,8 @@ public class AnnotatedBeanDefinitionReader {
 		}
 
 		abd.setInstanceSupplier(supplier);
+		//解析@Scope注解，看看是否有设置代理
+		System.out.println("解析@Scope注解，看看是否有设置代理,类为："+beanClass.getName());
 		ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(abd);
 		abd.setScope(scopeMetadata.getScopeName());
 		String beanName = (name != null ? name : this.beanNameGenerator.generateBeanName(abd, this.registry));
@@ -263,9 +270,11 @@ public class AnnotatedBeanDefinitionReader {
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(abd);
 		if (qualifiers != null) {
 			for (Class<? extends Annotation> qualifier : qualifiers) {
+				//如果有相同的类型的bean则会优先使用带有@Primary注解的
 				if (Primary.class == qualifier) {
 					abd.setPrimary(true);
 				}
+				//@Lazy注解
 				else if (Lazy.class == qualifier) {
 					abd.setLazyInit(true);
 				}
@@ -281,6 +290,7 @@ public class AnnotatedBeanDefinitionReader {
 		}
 
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(abd, beanName);
+		//判断类上如果有@Scope注解，是否设置代理，设置bean定义代理属性
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);
 	}
