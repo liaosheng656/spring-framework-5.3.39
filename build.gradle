@@ -443,5 +443,10 @@ configure(rootProject) {
 			}
 		}
 	}
-
 }
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+//tasks.withType(JavaCompile::class.java){
+//    options.encoding='UTF-8'
+//}
