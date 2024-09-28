@@ -15,6 +15,8 @@ dependencies {
     implementation project(":spring-context")
     implementation project(":spring-instrument")
     implementation project(":spring-aop")
+    implementation 'com.alibaba.fastjson2:fastjson2:2.0.52'
+//    implementation 'org.projectlombok:lombok:1.18.30'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 //    testCompile group: 'junit', name: 'junit', version: '4.12'
