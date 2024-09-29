@@ -566,6 +566,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 			// Prepare the bean factory for use in this context.
 			prepareBeanFactory(beanFactory);
+            logger.info("prepareBeanFactory，beanFactory的准备工作完成");
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
@@ -703,7 +704,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
 		// Configure the bean factory with context callbacks.
+        //用上下文回调配置bean工厂---bean的默认后置处理器
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
+        logger.info("准备加载一堆Aware");
+        //加一堆Aware
 		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
 		beanFactory.ignoreDependencyInterface(EmbeddedValueResolverAware.class);
 		beanFactory.ignoreDependencyInterface(ResourceLoaderAware.class);
@@ -712,12 +716,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.ignoreDependencyInterface(ApplicationContextAware.class);
 		beanFactory.ignoreDependencyInterface(ApplicationStartupAware.class);
 
+        logger.info("准备解析器，bean工厂、资源加载器、多播器-事件推送器、上下文、监听器");
 		// BeanFactory interface not registered as resolvable type in a plain factory.
 		// MessageSource registered (and found for autowiring) as a bean.
+        //注册BeanFactory----
 		beanFactory.registerResolvableDependency(BeanFactory.class, beanFactory);
+        //注册资源加载器
 		beanFactory.registerResolvableDependency(ResourceLoader.class, this);
+        //注册多播器-事件推送器
 		beanFactory.registerResolvableDependency(ApplicationEventPublisher.class, this);
-		beanFactory.registerResolvableDependency(ApplicationContext.class, this);
+		//注册上下文
+        beanFactory.registerResolvableDependency(ApplicationContext.class, this);
 
 		// Register early post-processor for detecting inner beans as ApplicationListeners.
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));
@@ -730,6 +739,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Register default environment beans.
+        logger.info("Register default environment beans.直接就注册一下默认的单例bean：环境、系统配置、系统环境、");
 		if (!beanFactory.containsLocalBean(ENVIRONMENT_BEAN_NAME)) {
 			beanFactory.registerSingleton(ENVIRONMENT_BEAN_NAME, getEnvironment());
 		}
