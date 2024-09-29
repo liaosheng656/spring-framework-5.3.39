@@ -1,7 +1,7 @@
 package com.af;
 
 
-import lombok.extern.slf4j.Slf4j;
+//import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.*;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class RunSpringDemo {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
-        //������������
+        //无配置文件启动
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(RunSpringDemo.class);
 //		context.getBean("");
         //����bean

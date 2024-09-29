@@ -283,11 +283,15 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws IllegalStateException {
+        //判断是否已经刷新过了，refresh()刷新过了，容器就不能重复刷新
+        System.out.println("判断是否已经刷新过了，refresh()刷新过了，容器就不能重复刷新");
 		if (!this.refreshed.compareAndSet(false, true)) {
 			throw new IllegalStateException(
 					"GenericApplicationContext does not support multiple refresh attempts: just call 'refresh' once");
 		}
+        //设置序列号id
 		this.beanFactory.setSerializationId(getId());
+        System.out.println("设置序列号id,id="+getId());
 	}
 
 	@Override
