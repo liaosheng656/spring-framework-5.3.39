@@ -577,6 +577,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
                 logger.info("BeanFactory前置工作都做好了，准备执行");
 				// Invoke factory processors registered as beans in the context.
+                logger.info("加载时间编织器,不懂啥玩意");
 				invokeBeanFactoryPostProcessors(beanFactory);
 				// Register bean processors that intercept bean creation.
 				registerBeanPostProcessors(beanFactory);
@@ -775,12 +776,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>Must be called before singleton instantiation.
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+        //这里还有一行-----
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
 		// (e.g. through an @Bean method registered by ConfigurationClassPostProcessor)
 		if (!NativeDetector.inNativeImage() && beanFactory.getTempClassLoader() == null &&
 				beanFactory.containsBean(LOAD_TIME_WEAVER_BEAN_NAME)) {
+            logger.info("加载时间编织器,不懂啥玩意");
 			beanFactory.addBeanPostProcessor(new LoadTimeWeaverAwareProcessor(beanFactory));
 			beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));
 		}

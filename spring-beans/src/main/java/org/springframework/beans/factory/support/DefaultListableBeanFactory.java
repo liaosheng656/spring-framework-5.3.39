@@ -536,6 +536,20 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return getBeanNamesForType(type, true, true);
 	}
 
+    /**
+     *
+     * @param type the class or interface to match, or {@code null} for all bean names
+     * @param includeNonSingletons whether to include prototype or scoped beans too
+     * or just singletons (also applies to FactoryBeans)
+     * @param allowEagerInit whether to initialize <i>lazy-init singletons</i> and
+     * <i>objects created by FactoryBeans</i> (or by factory methods with a
+     * "factory-bean" reference) for the type check. Note that FactoryBeans need to be
+     * eagerly initialized to determine their type: So be aware that passing in "true"
+     * for this flag will initialize FactoryBeans and "factory-bean" references.
+     * includeNonSingletons 包含非单例bean
+     * allowEagerInit false初始化，true从缓存中获取
+     * @return
+     */
 	@Override
 	public String[] getBeanNamesForType(@Nullable Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
 		if (!isConfigurationFrozen() || type == null || !allowEagerInit) {
@@ -556,10 +570,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	private String[] doGetBeanNamesForType(ResolvableType type, boolean includeNonSingletons, boolean allowEagerInit) {
 		List<String> result = new ArrayList<>();
-
+        logger.info("doGetBeanNamesForType获取类型");
 		// Check all bean definitions.
 		for (String beanName : this.beanDefinitionNames) {
 			// Only consider bean as eligible if the bean name is not defined as alias for some other bean.
+            //非别名
 			if (!isAlias(beanName)) {
 				try {
 					RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);

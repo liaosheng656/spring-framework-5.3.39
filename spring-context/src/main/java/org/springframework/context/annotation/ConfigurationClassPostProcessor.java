@@ -77,6 +77,7 @@ import org.springframework.util.ClassUtils;
  * {@code <context:component-scan/>}. Otherwise, may be declared manually as
  * with any other {@link BeanFactoryPostProcessor}.
  *
+ *  @Configuration排序功能
  * <p>This post processor is priority-ordered as it is important that any
  * {@link Bean @Bean} methods declared in {@code @Configuration} classes have
  * their corresponding bean definitions registered before any other
