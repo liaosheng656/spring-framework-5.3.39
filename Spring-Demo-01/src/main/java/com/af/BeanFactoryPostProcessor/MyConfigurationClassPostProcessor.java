@@ -44,6 +44,13 @@ public class MyConfigurationClassPostProcessor
             rootBeanDefinition.setBeanClassName("com.af.service.StudentService");
             rootBeanDefinition.setBeanClassName(StudentService.class.getName());
             rootBeanDefinition.setBeanClass(StudentService.class);
+            rootBeanDefinition.setConstructorArgumentValues();
+            //自动配置AUTOWIRE_BY_TYPE还是AUTOWIRE_BY_NAME
+            rootBeanDefinition.setAutowireCandidate(false);
+            rootBeanDefinition.setAutowireMode(RootBeanDefinition.AUTOWIRE_BY_TYPE);
+            //如果是FactoryBean
+//            rootBeanDefinition.setFactoryBeanName();
+//            rootBeanDefinition.setFactoryMethodName();
             //bean定义名字---studentService
             registry.registerBeanDefinition("studentService",rootBeanDefinition);
 

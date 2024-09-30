@@ -244,7 +244,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 					"postProcessBeanFactory already called on this post-processor against " + registry);
 		}
 		this.registriesPostProcessed.add(registryId);
-
+        logger.info("调用processConfigBeanDefinitions()方法，类 = "+this.getClass().getName());
 		processConfigBeanDefinitions(registry);
 	}
 
@@ -276,9 +276,12 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 */
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
 		List<BeanDefinitionHolder> configCandidates = new ArrayList<>();
+        //获取bean定义名称
 		String[] candidateNames = registry.getBeanDefinitionNames();
+        logger.info("bean定义有="+candidateNames);
 
 		for (String beanName : candidateNames) {
+            //获取bean定义
 			BeanDefinition beanDef = registry.getBeanDefinition(beanName);
 			if (beanDef.getAttribute(ConfigurationClassUtils.CONFIGURATION_CLASS_ATTRIBUTE) != null) {
 				if (logger.isDebugEnabled()) {
