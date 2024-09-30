@@ -292,6 +292,8 @@ public class AnnotatedBeanDefinitionReader {
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(abd, beanName);
 		//判断类上如果有@Scope注解，是否设置代理，设置bean定义代理属性
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+        //注册配置类（一般都是启动类）
+        System.out.println("注册配置类（一般都是启动类）,类为："+beanClass.getName());
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);
 	}
 

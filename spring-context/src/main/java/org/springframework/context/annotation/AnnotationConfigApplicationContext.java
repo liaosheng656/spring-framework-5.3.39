@@ -95,7 +95,9 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 		this();
 		String str = "开始注册"+(componentClasses.getClass().getName())+"类-bean定义及设置一些bean定义的属性，比如代理";
 		logger.info(str);
-		//注册componentClasses类-bean定义及设置一些bean定义的属性，比如代理
+		//注册componentClasses类-bean定义及设置一些bean定义的属性，比如代理、注册配置类（一般为启动类型）
+        logger.info("注册componentClasses类-bean定义及设置一些bean定义的属性，比如代理、注册配置类（一般为启动类型）,componentClasses = "
+                + componentClasses.getClass().getName());
 		register(componentClasses);
 		logger.info("来到重头戏份refresh()");
 		refresh();

@@ -40,10 +40,11 @@ public class MyConfigurationClassPostProcessor
             System.out.println("设置orderService初始化方法,beanClassName = "+beanClassName);
 
             RootBeanDefinition rootBeanDefinition = new RootBeanDefinition();
-            //bean定义名字
+            //类路径
             rootBeanDefinition.setBeanClassName("com.af.service.StudentService");
             rootBeanDefinition.setBeanClassName(StudentService.class.getName());
             rootBeanDefinition.setBeanClass(StudentService.class);
+            //bean定义名字---studentService
             registry.registerBeanDefinition("studentService",rootBeanDefinition);
 
             System.out.println("注册studentService-----bean定义");
