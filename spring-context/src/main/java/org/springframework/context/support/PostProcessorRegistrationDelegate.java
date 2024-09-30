@@ -55,7 +55,7 @@ final class PostProcessorRegistrationDelegate {
 	private PostProcessorRegistrationDelegate() {
 	}
 
-    private static final Log logger = LogFactory.getLog(getClass());
+    private static final Log logger = LogFactory.getLog(PostProcessorRegistrationDelegate.class);
 
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
@@ -315,7 +315,7 @@ final class PostProcessorRegistrationDelegate {
 		for (BeanDefinitionRegistryPostProcessor postProcessor : postProcessors) {
 			StartupStep postProcessBeanDefRegistry = applicationStartup.start("spring.context.beandef-registry.post-process")
 					.tag("postProcessor", postProcessor::toString);
-            logger.info("回调bean工厂/定义后置处理器方法,class = "postProcessor.getClass().getName());
+            logger.info("回调bean工厂/定义后置处理器方法,class = "+postProcessor.getClass().getName());
 			postProcessor.postProcessBeanDefinitionRegistry(registry);
 			postProcessBeanDefRegistry.end();
 		}

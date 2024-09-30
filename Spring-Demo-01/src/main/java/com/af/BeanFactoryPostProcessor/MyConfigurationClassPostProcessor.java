@@ -1,9 +1,11 @@
 package com.af.BeanFactoryPostProcessor;
 
 import com.af.service.StudentService;
+import com.af.service.UserService;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -44,10 +46,16 @@ public class MyConfigurationClassPostProcessor
             rootBeanDefinition.setBeanClassName("com.af.service.StudentService");
             rootBeanDefinition.setBeanClassName(StudentService.class.getName());
             rootBeanDefinition.setBeanClass(StudentService.class);
-            rootBeanDefinition.setConstructorArgumentValues();
-            //自动配置AUTOWIRE_BY_TYPE还是AUTOWIRE_BY_NAME
-            rootBeanDefinition.setAutowireCandidate(false);
-            rootBeanDefinition.setAutowireMode(RootBeanDefinition.AUTOWIRE_BY_TYPE);
+            // 设置构造函数参数
+            ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues();
+            constructorArgumentValues.addIndexedArgumentValue(0, new UserService());
+            constructorArgumentValues.addIndexedArgumentValue(1,new UserService());
+            //指定构造方法
+            rootBeanDefinition.setConstructorArgumentValues(constructorArgumentValues);
+//            //自动配置AUTOWIRE_BY_TYPE还是AUTOWIRE_BY_NAME
+//            rootBeanDefinition.setAutowireCandidate(false);
+//            //AUTOWIRE_BY_TYPE
+//            rootBeanDefinition.setAutowireMode(RootBeanDefinition.AUTOWIRE_BY_TYPE);
             //如果是FactoryBean
 //            rootBeanDefinition.setFactoryBeanName();
 //            rootBeanDefinition.setFactoryMethodName();
