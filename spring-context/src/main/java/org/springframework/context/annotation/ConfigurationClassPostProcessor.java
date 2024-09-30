@@ -245,6 +245,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 		this.registriesPostProcessed.add(registryId);
         logger.info("调用processConfigBeanDefinitions()方法，类 = "+this.getClass().getName());
+        logger.info("registry类 = "+registry.getClass().getName());
 		processConfigBeanDefinitions(registry);
 	}
 
@@ -289,7 +290,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				}
 			}
 			else if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
-				configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));
+				//如果BeanDefinition类上有@Configuration就加进来，说明是配置类
+                configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));
 			}
 		}
 
@@ -299,6 +301,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 
 		// Sort by previously determined @Order value, if applicable
+        //如果类有@Order注解，就排序，从小到大
 		configCandidates.sort((bd1, bd2) -> {
 			int i1 = ConfigurationClassUtils.getOrder(bd1.getBeanDefinition());
 			int i2 = ConfigurationClassUtils.getOrder(bd2.getBeanDefinition());
@@ -307,24 +310,31 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 		// Detect any custom bean name generation strategy supplied through the enclosing application context
 		SingletonBeanRegistry sbr = null;
+        //如果是SingletonBeanRegistry，默认就是，因为传进来的registry其实就是DefaultListableBeanFactory
 		if (registry instanceof SingletonBeanRegistry) {
 			sbr = (SingletonBeanRegistry) registry;
 			if (!this.localBeanNameGeneratorSet) {
+                //注册一个内部的bean名字生成器
+                logger.info("注册一个内部的bean名字生成器（单例） = org.springframework.context.annotation.internalConfigurationBeanNameGenerator");
 				BeanNameGenerator generator = (BeanNameGenerator) sbr.getSingleton(
 						AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR);
 				if (generator != null) {
+                    //componentScan的bean名称生成器
 					this.componentScanBeanNameGenerator = generator;
+                    //import的bean名称生成器
 					this.importBeanNameGenerator = generator;
 				}
 			}
 		}
 
+        //第一次进来应该是空的
 		if (this.environment == null) {
 			this.environment = new StandardEnvironment();
 		}
 
 		// Parse each @Configuration class
-		ConfigurationClassParser parser = new ConfigurationClassParser(
+        logger.info("构造一个@Configuration解析器");
+        ConfigurationClassParser parser = new ConfigurationClassParser(
 				this.metadataReaderFactory, this.problemReporter, this.environment,
 				this.resourceLoader, this.componentScanBeanNameGenerator, registry);
 

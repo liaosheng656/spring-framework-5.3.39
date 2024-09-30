@@ -1,7 +1,9 @@
 package com.af.service;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+@Order(4)
 @Component
 public class OrderService {
 

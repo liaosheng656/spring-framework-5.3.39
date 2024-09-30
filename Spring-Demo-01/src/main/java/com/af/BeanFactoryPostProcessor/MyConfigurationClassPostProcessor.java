@@ -43,8 +43,8 @@ public class MyConfigurationClassPostProcessor
 
             RootBeanDefinition rootBeanDefinition = new RootBeanDefinition();
             //类路径
-            rootBeanDefinition.setBeanClassName("com.af.service.StudentService");
-            rootBeanDefinition.setBeanClassName(StudentService.class.getName());
+//            rootBeanDefinition.setBeanClassName("com.af.service.StudentService");
+//            rootBeanDefinition.setBeanClassName(StudentService.class.getName());
             rootBeanDefinition.setBeanClass(StudentService.class);
             // 设置构造函数参数
             ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues();

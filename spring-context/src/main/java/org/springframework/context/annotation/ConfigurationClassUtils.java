@@ -85,20 +85,27 @@ abstract class ConfigurationClassUtils {
 	public static boolean checkConfigurationClassCandidate(
 			BeanDefinition beanDef, MetadataReaderFactory metadataReaderFactory) {
 
+        logger.info("获取类上@Configuration注解的BeanDefinition,class = "+beanDef.getClass().getName());
+        //设置类的路径，如：com.af.service.StudentService
 		String className = beanDef.getBeanClassName();
 		if (className == null || beanDef.getFactoryMethodName() != null) {
 			return false;
 		}
 
+        //注解-类上的注解
 		AnnotationMetadata metadata;
 		if (beanDef instanceof AnnotatedBeanDefinition &&
 				className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
 			// Can reuse the pre-parsed metadata from the given BeanDefinition...
+            //获取目标类上的注解信息
 			metadata = ((AnnotatedBeanDefinition) beanDef).getMetadata();
 		}
+        //抽象的bean定义
 		else if (beanDef instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) beanDef).hasBeanClass()) {
 			// Check already loaded Class if present...
 			// since we possibly can't even load the class file for this Class.
+            //例如，如果类B继承自类A，那么B.isAssignableFrom(A)将返回true
+            //是否下面接口的子类
 			Class<?> beanClass = ((AbstractBeanDefinition) beanDef).getBeanClass();
 			if (BeanFactoryPostProcessor.class.isAssignableFrom(beanClass) ||
 					BeanPostProcessor.class.isAssignableFrom(beanClass) ||
@@ -109,7 +116,9 @@ abstract class ConfigurationClassUtils {
 			metadata = AnnotationMetadata.introspect(beanClass);
 		}
 		else {
+            //如果没有设置beanClass，则Spring会帮忙找
 			try {
+                //根据设置类的路径找对应的类，比如：com.af.service.StudentService
 				MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(className);
 				metadata = metadataReader.getAnnotationMetadata();
 			}
@@ -122,18 +131,23 @@ abstract class ConfigurationClassUtils {
 			}
 		}
 
+        //查看目标类上是否有@Configuration注解
 		Map<String, Object> config = metadata.getAnnotationAttributes(Configuration.class.getName());
+        //是否设置代理，如果是代理，设置为full类
 		if (config != null && !Boolean.FALSE.equals(config.get("proxyBeanMethods"))) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
+        //没有设置代理，设置为lite
 		else if (config != null || isConfigurationCandidate(metadata)) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 		}
 		else {
+            //没有Configuration注解
 			return false;
 		}
 
 		// It's a full or lite configuration candidate... Let's determine the order value, if any.
+        //设置有排序，即有@Order注解
 		Integer order = getOrder(metadata);
 		if (order != null) {
 			beanDef.setAttribute(ORDER_ATTRIBUTE, order);
