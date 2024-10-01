@@ -1,4 +1,4 @@
-package com.af.BeanFactoryPostProcessor;
+package com.af.beanFactoryPostProcessor;
 
 import com.af.service.StudentService;
 import com.af.service.UserService;
@@ -9,7 +9,6 @@ import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.stereotype.Component;
 
 

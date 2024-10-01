@@ -8,11 +8,11 @@ import org.springframework.stereotype.Component;
 public class OrderService {
 
     public OrderService(){
-        System.out.println("调用无参构造方法");
+        System.out.println("调用OrderService无参构造方法");
     }
 
     public OrderService(UserService userService){
-        System.out.println("调用有一个构造方法的OrderService, userService="+userService);
+        System.out.println("调用OrderService有一个构造方法的OrderService, userService="+userService);
     }
 
     public void orderServiceTest01(){
