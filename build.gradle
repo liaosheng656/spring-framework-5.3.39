@@ -451,6 +451,7 @@ tasks.withType(JavaCompile) {
 dependencies {
     implementation 'com.alibaba.fastjson2:fastjson2:2.0.52'
     implementation 'org.projectlombok:lombok:1.18.30'
+	implementation 'org.yaml:snakeyaml:2.0'
 }
 
 //tasks.withType(JavaCompile::class.java){

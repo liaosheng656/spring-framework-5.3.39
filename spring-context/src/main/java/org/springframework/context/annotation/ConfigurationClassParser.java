@@ -300,6 +300,7 @@ class ConfigurationClassParser {
 		for (AnnotationAttributes propertySource : AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), PropertySources.class,
 				org.springframework.context.annotation.PropertySource.class)) {
+			logger.info("sourceClass含有@PropertySource注解，sourceClass = "+sourceClass.getClass().getName());
 			if (this.environment instanceof ConfigurableEnvironment) {
 				processPropertySource(propertySource);
 			}
@@ -486,14 +487,18 @@ class ConfigurationClassParser {
 		Assert.isTrue(locations.length > 0, "At least one @PropertySource(value) location is required");
 		boolean ignoreResourceNotFound = propertySource.getBoolean("ignoreResourceNotFound");
 
+		//DefaultPropertySourceFactory资源解析器，比如解析.properties文件
 		Class<? extends PropertySourceFactory> factoryClass = propertySource.getClass("factory");
+		//如果没有指定资源解析器/工厂，就用默认的，不然就用指定的，比如yml文件解析工厂
 		PropertySourceFactory factory = (factoryClass == PropertySourceFactory.class ?
 				DEFAULT_PROPERTY_SOURCE_FACTORY : BeanUtils.instantiateClass(factoryClass));
 
+		//遍历添加配置信息
 		for (String location : locations) {
 			try {
 				String resolvedLocation = this.environment.resolveRequiredPlaceholders(location);
 				Resource resource = this.resourceLoader.getResource(resolvedLocation);
+				//回调自定义factory
 				addPropertySource(factory.createPropertySource(name, new EncodedResource(resource, encoding)));
 			}
 			catch (IllegalArgumentException | FileNotFoundException | UnknownHostException | SocketException ex) {

@@ -179,6 +179,7 @@ public @interface PropertySource {
 	 * @see org.springframework.core.env.PropertySource#getName()
 	 * @see org.springframework.core.io.Resource#getDescription()
 	 */
+	//资源名称，为空则根据资源的描述符生成
 	String name() default "";
 
 	/**
@@ -195,6 +196,11 @@ public @interface PropertySource {
 	 * <p>Each location will be added to the enclosing {@code Environment} as its own
 	 * property source, and in the order declared.
 	 */
+	/**
+	 *资源路径
+	 *classpath:application.properties
+	 *file:/
+	 */
 	String[] value();
 
 	/**
@@ -204,12 +210,14 @@ public @interface PropertySource {
 	 * <p>Default is {@code false}.
 	 * @since 4.0
 	 */
+	//是否忽略资源不存在的情况，如果不忽略，当资源不存在时报错
 	boolean ignoreResourceNotFound() default false;
 
 	/**
 	 * A specific character encoding for the given resources, e.g. "UTF-8".
 	 * @since 4.3
 	 */
+	//指定资源文件的编码格式
 	String encoding() default "";
 
 	/**
@@ -219,6 +227,7 @@ public @interface PropertySource {
 	 * @see org.springframework.core.io.support.DefaultPropertySourceFactory
 	 * @see org.springframework.core.io.support.ResourcePropertySource
 	 */
+	//资源工厂,比如指定一个yml属性读取工厂类
 	Class<? extends PropertySourceFactory> factory() default PropertySourceFactory.class;
 
 }

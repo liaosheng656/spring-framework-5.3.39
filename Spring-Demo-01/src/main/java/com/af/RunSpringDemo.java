@@ -3,6 +3,7 @@ package com.af;
 
 //import lombok.extern.slf4j.Slf4j;
 import com.af.annotation.MyAnnotation;
+import com.af.service.PerSonService;
 import com.af.service.StudentService;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,11 @@ public class RunSpringDemo {
                 StudentService student = (StudentService) studentService;
                 student.studentServiceTest01();
             }
+			Object perSonServiceObj = context.getBean("perSonService");
+            if(perSonServiceObj != null){
+				PerSonService perSonService  = (PerSonService) perSonServiceObj;
+				perSonService.perSonYmlAndProperties();
+			}
             //�
         }catch (Exception e){
             e.printStackTrace();
