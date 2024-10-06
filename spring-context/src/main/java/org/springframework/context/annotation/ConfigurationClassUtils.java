@@ -165,10 +165,14 @@ abstract class ConfigurationClassUtils {
 	 */
 	public static boolean isConfigurationCandidate(AnnotationMetadata metadata) {
 		// Do not consider an interface or an annotation...
+		//如果是个接口，是不能成为bean定义的
 		if (metadata.isInterface()) {
 			return false;
 		}
 
+		//是否包含下面4个注解
+//		Component.class.getName();ComponentScan.class.getName();
+//		Import.class.getName();ImportResource.class.getName();
 		// Any of the typical annotations found?
 		for (String indicator : candidateIndicators) {
 			if (metadata.isAnnotated(indicator)) {

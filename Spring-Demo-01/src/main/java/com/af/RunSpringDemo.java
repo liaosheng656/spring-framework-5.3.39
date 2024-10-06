@@ -5,6 +5,7 @@ package com.af;
 import com.af.annotation.MyAnnotation;
 import com.af.service.StudentService;
 import org.springframework.context.annotation.*;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
@@ -18,6 +19,19 @@ import java.io.IOException;
 @MyAnnotation(init = false)
 public class RunSpringDemo {
 
+	/**
+	 * 内部类也可以被扫到
+	 * {@link org.springframework.context.annotation.ConfigurationClassParser#processMemberClasses
+	 * (org.springframework.context.annotation.ConfigurationClass,
+	 * org.springframework.context.annotation.ConfigurationClassParser.SourceClass,
+	 * java.util.function.Predicate)}
+	 */
+	@Component
+	class  MemberRunSpringDemo{
+		public MemberRunSpringDemo(){
+			System.out.println("内部类MemberRunSpringDemo被调用了");
+		}
+	}
     public static void main(String[] args) {
 
         //无配置文件启动

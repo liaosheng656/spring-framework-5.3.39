@@ -7,6 +7,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,8 @@ import org.springframework.core.ResolvableType;
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.core.type.StandardAnnotationMetadata;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -38,6 +41,13 @@ public class MyCondition implements Condition {
 		if(annotations == null){
 			return false;
 		}
+		//获取类的注解
+//		if (metadata instanceof StandardAnnotationMetadata) {
+//			//加载源配置类
+//			return ((StandardAnnotationMetadata) metadata).getIntrospectedClass();
+//		}
+		//有没有@Bean方法
+//		metadata.hasAnnotatedMethods(Bean.class.getName())
 		String name = metadata.getClass().getName();
 		System.out.println("MyCondition--matches---name = "+name);
 		BeanDefinitionRegistry registry = context.getRegistry();
@@ -50,14 +60,15 @@ public class MyCondition implements Condition {
 			if (className == null || beanDef.getFactoryMethodName() != null) {
 				continue;
 			}
-			if (beanDef instanceof AnnotatedBeanDefinition &&
-					className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
-				// Can reuse the pre-parsed metadata from the given BeanDefinition...
-				//获取目标类上的注解信息
-				metadata = ((AnnotatedBeanDefinition) beanDef).getMetadata();
+			if (!(beanDef instanceof AnnotatedBeanDefinition &&
+					className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName()))) {
+				continue;
 			}
+			// Can reuse the pre-parsed metadata from the given BeanDefinition...
+			//获取目标类上的注解信息
+			AnnotationMetadata metadata1 = ((AnnotatedBeanDefinition) beanDef).getMetadata();
 			//查看目标类上是否有@Configuration注解
-			Map<String, Object> config = metadata.getAnnotationAttributes(MyAnnotation.class.getName());
+			Map<String, Object> config = metadata1.getAnnotationAttributes(MyAnnotation.class.getName());
 			if(config == null){
 				continue;
 			}

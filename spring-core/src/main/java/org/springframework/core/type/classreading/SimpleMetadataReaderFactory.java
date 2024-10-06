@@ -19,6 +19,8 @@ package org.springframework.core.type.classreading;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -70,13 +72,14 @@ public class SimpleMetadataReaderFactory implements MetadataReaderFactory {
 	public final ResourceLoader getResourceLoader() {
 		return this.resourceLoader;
 	}
-
+	private final Log logger = LogFactory.getLog(getClass());
 
 	@Override
 	public MetadataReader getMetadataReader(String className) throws IOException {
 		try {
 			String resourcePath = ResourceLoader.CLASSPATH_URL_PREFIX +
 					ClassUtils.convertClassNameToResourcePath(className) + ClassUtils.CLASS_FILE_SUFFIX;
+			logger.info("源配置地址resourcePath = "+resourcePath);
 			Resource resource = this.resourceLoader.getResource(resourcePath);
 			return getMetadataReader(resource);
 		}
