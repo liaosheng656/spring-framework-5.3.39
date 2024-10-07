@@ -532,6 +532,10 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 */
 	protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
 		AnnotationMetadata metadata = beanDefinition.getMetadata();
+		boolean concrete = metadata.isConcrete();
+		if(!concrete){
+			logger.info("这个类是接口或注解，不能变成beanDefinition，Interface = "+beanDefinition.getBeanClassName());
+		}
 		//metadata.isConcrete()会判断接口、抽象类
 		return (metadata.isIndependent() && (metadata.isConcrete() ||
 				(metadata.isAbstract() && metadata.hasAnnotatedMethods(Lookup.class.getName()))));

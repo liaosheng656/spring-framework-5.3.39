@@ -62,7 +62,9 @@ abstract class ParserStrategyUtils {
 		}
 		ClassLoader classLoader = (registry instanceof ConfigurableBeanFactory ?
 				((ConfigurableBeanFactory) registry).getBeanClassLoader() : resourceLoader.getClassLoader());
+		//创建实例
 		T instance = (T) createInstance(clazz, environment, resourceLoader, registry, classLoader);
+		//AwareMethods 方法回调
 		ParserStrategyUtils.invokeAwareMethods(instance, environment, resourceLoader, registry, classLoader);
 		return instance;
 	}
@@ -118,6 +120,14 @@ abstract class ParserStrategyUtils {
 		throw new IllegalStateException("Illegal method parameter type: " + parameterType.getName());
 	}
 
+	/**
+	 * AwareMethods 方法回调
+	 * @param parserStrategyBean
+	 * @param environment
+	 * @param resourceLoader
+	 * @param registry
+	 * @param classLoader
+	 */
 	private static void invokeAwareMethods(Object parserStrategyBean, Environment environment,
 			ResourceLoader resourceLoader, BeanDefinitionRegistry registry, @Nullable ClassLoader classLoader) {
 

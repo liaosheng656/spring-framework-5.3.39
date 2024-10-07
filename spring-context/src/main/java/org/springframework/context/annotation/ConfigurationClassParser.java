@@ -274,6 +274,7 @@ class ConfigurationClassParser {
 		}
 		while (sourceClass != null);
 
+		System.out.println("往parse解析器添加配置类或import等方式导入的类，后期会注册为BeanDefinition，configClass = "+configClass.getClass().getName());
 		this.configurationClasses.put(configClass, configClass);
 	}
 
@@ -615,7 +616,8 @@ class ConfigurationClassParser {
 		if (importCandidates.isEmpty()) {
 			return;
 		}
-		logger.info("解析@Import注解,configClass = "+configClass);
+		System.out.println("解析@Import注解,configClass = "+configClass.getBeanName());
+		logger.info("解析@Import注解,configClass = "+configClass.getBeanName());
 
 		if (checkForCircularImports && isChainedImportOnStack(configClass)) {
 			this.problemReporter.error(new CircularImportProblem(configClass, this.importStack));
@@ -627,8 +629,10 @@ class ConfigurationClassParser {
 				for (SourceClass candidate : importCandidates) {
 					//如果实现了ImportSelector接口
 					if (candidate.isAssignable(ImportSelector.class)) {
+						logger.info("实现了ImportSelector接口,selector = "+candidate.getClass().getName());
 						// Candidate class is an ImportSelector -> delegate to it to determine imports
 						Class<?> candidateClass = candidate.loadClass();
+						//获取selector实例，如果实现了Aware接口，会回调
 						ImportSelector selector = ParserStrategyUtils.instantiateClass(candidateClass, ImportSelector.class,
 								this.environment, this.resourceLoader, this.registry);
 						Predicate<String> selectorFilter = selector.getExclusionFilter();
@@ -636,28 +640,40 @@ class ConfigurationClassParser {
 							exclusionFilter = exclusionFilter.or(selectorFilter);
 						}
 						if (selector instanceof DeferredImportSelector) {
+							//加到list中和处理
 							this.deferredImportSelectorHandler.handle(configClass, (DeferredImportSelector) selector);
 						}
 						else {
+							//回调selectImports方法
+							logger.info("回调selectImports方法，selector = "+selector.getClass().getName());
 							String[] importClassNames = selector.selectImports(currentSourceClass.getMetadata());
+							//包装类名放到集合中
 							Collection<SourceClass> importSourceClasses = asSourceClasses(importClassNames, exclusionFilter);
+							//递归，因为import到进来的类本身也可能实现了selector接口
 							processImports(configClass, currentSourceClass, importSourceClasses, exclusionFilter, false);
 						}
 					}
+					//如果实现了ImportBeanDefinitionRegistrar接口
 					else if (candidate.isAssignable(ImportBeanDefinitionRegistrar.class)) {
+						logger.info("实现了ImportBeanDefinitionRegistrar接口,registrar = "+candidate.getClass().getName());
 						// Candidate class is an ImportBeanDefinitionRegistrar ->
 						// delegate to it to register additional bean definitions
 						Class<?> candidateClass = candidate.loadClass();
+						//获取ImportBeanDefinitionRegistrar实例，如果实现了Aware接口，会回调
 						ImportBeanDefinitionRegistrar registrar =
 								ParserStrategyUtils.instantiateClass(candidateClass, ImportBeanDefinitionRegistrar.class,
 										this.environment, this.resourceLoader, this.registry);
+						//addImportBeanDefinitionRegistrar
 						configClass.addImportBeanDefinitionRegistrar(registrar, currentSourceClass.getMetadata());
 					}
 					else {
+						logger.info("如果不是ImportSelector、ImportBeanDefinitionRegistrar，就当成普通的配置类处理，candidate = "+candidate.getClass().getName());
 						// Candidate class not an ImportSelector or ImportBeanDefinitionRegistrar ->
 						// process it as an @Configuration class
+						//如果不是ImportSelector、ImportBeanDefinitionRegistrar，就当成普通的配置类
 						this.importStack.registerImport(
 								currentSourceClass.getMetadata(), candidate.getMetadata().getClassName());
+						//按普通的配置类处理，即按@Configuration处理
 						processConfigurationClass(candidate.asConfigClass(configClass), exclusionFilter);
 					}
 				}
