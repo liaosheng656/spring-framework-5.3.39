@@ -311,12 +311,15 @@ class ConfigurationClassParser {
 		}
 
 		// Process any @ComponentScan annotations
+		//解析@ComponentScan、@ComponentScans注解
 		Set<AnnotationAttributes> componentScans = AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), ComponentScans.class, ComponentScan.class);
 		if (!componentScans.isEmpty() &&
 				!this.conditionEvaluator.shouldSkip(sourceClass.getMetadata(), ConfigurationPhase.REGISTER_BEAN)) {
 			for (AnnotationAttributes componentScan : componentScans) {
 				// The config class is annotated with @ComponentScan -> perform the scan immediately
+
+				// 解析@ComponentScan注解、扫描获取BeanDefinition、设置基本属性、Lazy、代理等等
 				Set<BeanDefinitionHolder> scannedBeanDefinitions =
 						this.componentScanParser.parse(componentScan, sourceClass.getMetadata().getClassName());
 				// Check the set of scanned definitions for any further config classes and parse recursively if needed
@@ -325,7 +328,11 @@ class ConfigurationClassParser {
 					if (bdCand == null) {
 						bdCand = holder.getBeanDefinition();
 					}
+					//判断这个BeanDefinition是否有@Configuration注解
 					if (ConfigurationClassUtils.checkConfigurationClassCandidate(bdCand, this.metadataReaderFactory)) {
+						String beanClassName = bdCand.getBeanClassName();
+						//如果这个BeanDefinition类有@Configuration注解，又会走一遍解析（配置类）流程（类似递归）
+						logger.info("如果这个BeanDefinition类有@Configuration注解，又会走一遍解析（配置类）流程（类似递归）,beanClassName = "+beanClassName);
 						parse(bdCand.getBeanClassName(), holder.getBeanName());
 					}
 				}
@@ -333,6 +340,7 @@ class ConfigurationClassParser {
 		}
 
 		// Process any @Import annotations
+		//解析@Import注解
 		processImports(configClass, sourceClass, getImports(sourceClass), filter, true);
 
 		// Process any @ImportResource annotations
@@ -553,11 +561,13 @@ class ConfigurationClassParser {
 
 
 	/**
+	 * 获取类上有没有@Import注解
 	 * Returns {@code @Import} class, considering all meta-annotations.
 	 */
 	private Set<SourceClass> getImports(SourceClass sourceClass) throws IOException {
 		Set<SourceClass> imports = new LinkedHashSet<>();
 		Set<SourceClass> visited = new LinkedHashSet<>();
+		//获取类上有没有@Import注解
 		collectImports(sourceClass, imports, visited);
 		return imports;
 	}
@@ -575,6 +585,7 @@ class ConfigurationClassParser {
 	 * @param visited used to track visited classes to prevent infinite recursion
 	 * @throws IOException if there is any problem reading metadata from the named class
 	 */
+	//获取类上有没有@Import注解
 	private void collectImports(SourceClass sourceClass, Set<SourceClass> imports, Set<SourceClass> visited)
 			throws IOException {
 
@@ -589,6 +600,14 @@ class ConfigurationClassParser {
 		}
 	}
 
+	/**
+	 *
+	 * @param configClass
+	 * @param currentSourceClass
+	 * @param importCandidates
+	 * @param exclusionFilter
+	 * @param checkForCircularImports
+	 */
 	private void processImports(ConfigurationClass configClass, SourceClass currentSourceClass,
 			Collection<SourceClass> importCandidates, Predicate<String> exclusionFilter,
 			boolean checkForCircularImports) {
@@ -596,14 +615,17 @@ class ConfigurationClassParser {
 		if (importCandidates.isEmpty()) {
 			return;
 		}
+		logger.info("解析@Import注解,configClass = "+configClass);
 
 		if (checkForCircularImports && isChainedImportOnStack(configClass)) {
 			this.problemReporter.error(new CircularImportProblem(configClass, this.importStack));
 		}
 		else {
+			//进栈
 			this.importStack.push(configClass);
 			try {
 				for (SourceClass candidate : importCandidates) {
+					//如果实现了ImportSelector接口
 					if (candidate.isAssignable(ImportSelector.class)) {
 						// Candidate class is an ImportSelector -> delegate to it to determine imports
 						Class<?> candidateClass = candidate.loadClass();
@@ -649,6 +671,7 @@ class ConfigurationClassParser {
 						configClass.getMetadata().getClassName() + "]", ex);
 			}
 			finally {
+				//出栈
 				this.importStack.pop();
 			}
 		}

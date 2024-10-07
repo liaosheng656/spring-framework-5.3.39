@@ -246,10 +246,17 @@ public abstract class AnnotationConfigUtils {
 	}
 
 	public static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd) {
+		//设置一些BeanDefinition的一些公共属性，比如：Lazy、DependsOn等
 		processCommonDefinitionAnnotations(abd, abd.getMetadata());
 	}
 
+	/**
+	 * 设置一些BeanDefinition的一些公共属性
+	 * @param abd
+	 * @param metadata
+	 */
 	static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd, AnnotatedTypeMetadata metadata) {
+		//懒加载
 		AnnotationAttributes lazy = attributesFor(metadata, Lazy.class);
 		if (lazy != null) {
 			abd.setLazyInit(lazy.getBoolean("value"));
@@ -261,9 +268,11 @@ public abstract class AnnotationConfigUtils {
 			}
 		}
 
+		//相关的bean，如果设置了@Primary，优先级会变高
 		if (metadata.isAnnotated(Primary.class.getName())) {
 			abd.setPrimary(true);
 		}
+		//依赖于
 		AnnotationAttributes dependsOn = attributesFor(metadata, DependsOn.class);
 		if (dependsOn != null) {
 			abd.setDependsOn(dependsOn.getStringArray("value"));
@@ -279,6 +288,13 @@ public abstract class AnnotationConfigUtils {
 		}
 	}
 
+	/**
+	 * （如果需要代理）设置BeanDefinition代理方式
+	 * @param metadata
+	 * @param definition
+	 * @param registry
+	 * @return
+	 */
 	static BeanDefinitionHolder applyScopedProxyMode(
 			ScopeMetadata metadata, BeanDefinitionHolder definition, BeanDefinitionRegistry registry) {
 

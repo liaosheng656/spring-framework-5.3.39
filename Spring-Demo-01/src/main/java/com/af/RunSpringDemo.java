@@ -35,6 +35,8 @@ public class RunSpringDemo {
 	}
     public static void main(String[] args) {
 
+		//扫描逻辑（关键）ConfigurationClassUtils.isConfigurationCandidate
+		//判断扫描的文件是否可以成为bean定义ClassPathScanningCandidateComponentProvider.isCandidateComponent
         //无配置文件启动
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(RunSpringDemo.class);
         try{

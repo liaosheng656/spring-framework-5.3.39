@@ -21,6 +21,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -64,17 +66,25 @@ class ComponentScanAnnotationParser {
 		this.registry = registry;
 	}
 
-
+	/**
+	 * 解析@ComponentScan注解、扫描获取BeanDefinition、设置基本属性、Lazy、代理等等
+	 * @param componentScan @ComponentScan注解
+	 * @param declaringClass 源类或者或有ComponentScan的类
+	 * @return
+	 */
 	public Set<BeanDefinitionHolder> parse(AnnotationAttributes componentScan, String declaringClass) {
+		//扫描器
 		ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(this.registry,
 				componentScan.getBoolean("useDefaultFilters"), this.environment, this.resourceLoader);
 
 		Class<? extends BeanNameGenerator> generatorClass = componentScan.getClass("nameGenerator");
 		boolean useInheritedGenerator = (BeanNameGenerator.class == generatorClass);
+		//bean名字构建类型
 		scanner.setBeanNameGenerator(useInheritedGenerator ? this.beanNameGenerator :
 				BeanUtils.instantiateClass(generatorClass));
 
 		ScopedProxyMode scopedProxyMode = componentScan.getEnum("scopedProxy");
+		//判断是否需要代理
 		if (scopedProxyMode != ScopedProxyMode.DEFAULT) {
 			scanner.setScopedProxyMode(scopedProxyMode);
 		}
@@ -85,6 +95,7 @@ class ComponentScanAnnotationParser {
 
 		scanner.setResourcePattern(componentScan.getString("resourcePattern"));
 
+		//包含的类
 		for (AnnotationAttributes includeFilterAttributes : componentScan.getAnnotationArray("includeFilters")) {
 			List<TypeFilter> typeFilters = TypeFilterUtils.createTypeFiltersFor(includeFilterAttributes, this.environment,
 					this.resourceLoader, this.registry);
@@ -92,6 +103,7 @@ class ComponentScanAnnotationParser {
 				scanner.addIncludeFilter(typeFilter);
 			}
 		}
+		//需要过滤的类
 		for (AnnotationAttributes excludeFilterAttributes : componentScan.getAnnotationArray("excludeFilters")) {
 			List<TypeFilter> typeFilters = TypeFilterUtils.createTypeFiltersFor(excludeFilterAttributes, this.environment,
 				this.resourceLoader, this.registry);
@@ -101,13 +113,16 @@ class ComponentScanAnnotationParser {
 		}
 
 		boolean lazyInit = componentScan.getBoolean("lazyInit");
+		//懒加载
 		if (lazyInit) {
 			scanner.getBeanDefinitionDefaults().setLazyInit(true);
 		}
 
 		Set<String> basePackages = new LinkedHashSet<>();
+		//要扫描的包
 		String[] basePackagesArray = componentScan.getStringArray("basePackages");
 		for (String pkg : basePackagesArray) {
+			//com.af（要扫描的包）
 			String[] tokenized = StringUtils.tokenizeToStringArray(this.environment.resolvePlaceholders(pkg),
 					ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
 			Collections.addAll(basePackages, tokenized);
@@ -116,16 +131,25 @@ class ComponentScanAnnotationParser {
 			basePackages.add(ClassUtils.getPackageName(clazz));
 		}
 		if (basePackages.isEmpty()) {
+			//如果没有设置扫描的包，则会扫描当前配置类的包路径
 			basePackages.add(ClassUtils.getPackageName(declaringClass));
 		}
 
+		//配置类自己，应该被排查，因为配置类本身就会被处理/扫描
 		scanner.addExcludeFilter(new AbstractTypeHierarchyTraversingFilter(false, false) {
 			@Override
 			protected boolean matchClassName(String className) {
 				return declaringClass.equals(className);
 			}
 		});
+		logger.info("扫描包basePackages = "+basePackages);
+		for (String packagePath:basePackages) {
+			System.out.println("配置类declaringClass = "+declaringClass+",packagePath = "+packagePath);
+		}
+		//扫描类得到BeanDefinition
+		logger.info("扫描类得到BeanDefinition,扫描包basePackages = "+basePackages);
 		return scanner.doScan(StringUtils.toStringArray(basePackages));
 	}
 
+	private final Log logger = LogFactory.getLog(getClass());
 }
