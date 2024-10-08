@@ -367,6 +367,8 @@ class ConfigurationClassParser {
 		}
 
 		// Process default methods on interfaces
+        //处理配置类的父接口，看看实现的接口的default默认方法里面是否有@Bean，
+        // 可以看com.af.Import1.ImportInitTrue例子
 		processInterfaces(configClass, sourceClass);
 
 		// Process superclass, if any
@@ -426,6 +428,8 @@ class ConfigurationClassParser {
 
 	/**
 	 * Register default methods on interfaces implemented by the configuration class.
+     * 处理配置类的父接口，看看实现的接口的default默认方法里面是否有@Bean，
+     * 可以看com.af.Import1.ImportInitTrue例子
 	 */
 	private void processInterfaces(ConfigurationClass configClass, SourceClass sourceClass) throws IOException {
 		for (SourceClass ifc : sourceClass.getInterfaces()) {
