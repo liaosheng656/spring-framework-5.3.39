@@ -9,6 +9,7 @@ import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 
@@ -63,5 +64,10 @@ public class MyConfigurationClassPostProcessor
 
             System.out.println("注册studentService-----bean定义");
         }
+    }
+
+    @Bean("studentService05")
+    public StudentService studentService01(){
+        return new StudentService();
     }
 }

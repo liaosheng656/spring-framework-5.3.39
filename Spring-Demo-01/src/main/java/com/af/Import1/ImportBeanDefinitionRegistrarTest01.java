@@ -1,7 +1,9 @@
 package com.af.Import1;
 
+import com.af.service.StudentService;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
 
@@ -27,5 +29,14 @@ public class ImportBeanDefinitionRegistrarTest01 implements ImportBeanDefinition
 
         System.out.println("回调registerBeanDefinitions，可以注册BeanDefinition," +
                 "importingClassMetadata = " +importingClassMetadata.getClassName());
+    }
+
+    /**
+     * 这个是不会调的，因为处理这个逻辑，没把这种情况当做配置类处理
+     * @return
+     */
+    @Bean("studentService04")
+    public StudentService studentService01(){
+        return new StudentService();
     }
 }

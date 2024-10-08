@@ -6,6 +6,7 @@ import com.af.annotation.MyAnnotation;
 import com.af.service.HelloService;
 import com.af.service.PerSonService;
 import com.af.service.StudentService;
+import com.alibaba.fastjson2.JSONObject;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +39,7 @@ public class RunSpringDemo {
 
 		//扫描逻辑（关键）ConfigurationClassUtils.isConfigurationCandidate
 		//判断扫描的文件是否可以成为bean定义ClassPathScanningCandidateComponentProvider.isCandidateComponent
+        //@Component、ComponentScan、Import、ImportResource、@Configuration 有这些注解的都可以为配置类
         //无配置文件启动
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(RunSpringDemo.class);
         try{
@@ -56,6 +58,9 @@ public class RunSpringDemo {
                 HelloService helloService = (HelloService) helloServiceObj;
                 helloService.HelloServiceTest();
             }
+            String[] singletonNames = context.getBeanFactory().getSingletonNames();
+            String json = JSONObject.toJSONString(singletonNames);
+            System.out.println("singletonNames = "+json);
             //�
         }catch (Exception e){
             e.printStackTrace();
@@ -63,11 +68,7 @@ public class RunSpringDemo {
 //		RunSpringServiceDemo bean = context.getBeanFactory().createBean(RunSpringServiceDemo.class);
 //		AFAnnotationConfigApplicationContext context = new AFAnnotationConfigApplicationContext(RunSpringDemo.class);
         System.out.println("finish-333333");
-        System.out.println("file.encoding: {}"+System.getProperty("file.encoding"));
-        System.out.println("怕了怕了");
-        System.out.println("解析@Scope注解，看看是否有设置代理,类为,什么鬼东西");
-        System.out.println("你大爷和搜到合法搜地金佛啊受打击无参构造方法");
-		System.out.println("获取类型");
+        System.out.println("file.encoding: "+System.getProperty("file.encoding"));
     }
 
 }

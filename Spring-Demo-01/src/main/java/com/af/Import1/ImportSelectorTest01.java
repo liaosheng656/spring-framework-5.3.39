@@ -1,6 +1,8 @@
 package com.af.Import1;
 
 import com.af.annotation.MyImportAnnotation;
+import com.af.service.StudentService;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.type.AnnotationMetadata;
 
@@ -25,4 +27,13 @@ public class ImportSelectorTest01 implements ImportSelector {
 		arr[0] = "com.af.Import1.ImportInitTrue";
 		return arr;
 	}
+
+    /**
+     * 这个也是不会调的，但是会导入的com.af.Import1.ImportInitTrue当做配置类处理
+     * @return
+     */
+    @Bean("studentService03")
+    public StudentService studentService01(){
+        return new StudentService();
+    }
 }

@@ -1,5 +1,8 @@
 package com.af.Import1;
 
+import com.af.service.StudentService;
+import org.springframework.context.annotation.Bean;
+
 /**
  *
  */
@@ -12,4 +15,9 @@ public class ImportInitTrue {
 	public void ImportInitTrueTest01(){
 		System.out.println("调用ImportInitTrueTest01方法");
 	}
+
+    @Bean("studentService02")
+    public StudentService studentService01(){
+        return new StudentService();
+    }
 }
