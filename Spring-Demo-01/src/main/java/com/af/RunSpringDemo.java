@@ -3,6 +3,7 @@ package com.af;
 
 //import lombok.extern.slf4j.Slf4j;
 import com.af.annotation.MyAnnotation;
+import com.af.service.HelloService;
 import com.af.service.PerSonService;
 import com.af.service.StudentService;
 import org.springframework.context.annotation.*;
@@ -50,6 +51,11 @@ public class RunSpringDemo {
 				PerSonService perSonService  = (PerSonService) perSonServiceObj;
 				perSonService.perSonYmlAndProperties();
 			}
+            Object helloServiceObj = context.getBean("helloService");
+            if(helloServiceObj != null){
+                HelloService helloService = (HelloService) helloServiceObj;
+                helloService.HelloServiceTest();
+            }
             //�
         }catch (Exception e){
             e.printStackTrace();

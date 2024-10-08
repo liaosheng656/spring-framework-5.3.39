@@ -1,9 +1,14 @@
 package com.af.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * 学生Service
  */
 public class StudentService {
+
+    @Autowired
+    private OrderService orderService;
 
     public StudentService(){
         System.out.println("StudentService无参构造方法被调用了");
@@ -14,7 +19,7 @@ public class StudentService {
     }
 
     public void studentServiceTest01(){
-        System.out.println("调用StudentServiceTest01");
+        System.out.println("调用StudentServiceTest01, orderService = "+orderService);
     }
 
 

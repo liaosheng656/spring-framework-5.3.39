@@ -153,6 +153,7 @@ class ConfigurationClassBeanDefinitionReader {
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
 
+        //这里把先前解析的ImportedResources和ImportBeanDefinitionRegistrars变成bean定义
 		loadBeanDefinitionsFromImportedResources(configClass.getImportedResources());
 		loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars());
 	}
@@ -391,6 +392,7 @@ class ConfigurationClassBeanDefinitionReader {
 		});
 	}
 
+    //回调ImportBeanDefinitionRegistrar.registerBeanDefinitions
 	private void loadBeanDefinitionsFromRegistrars(Map<ImportBeanDefinitionRegistrar, AnnotationMetadata> registrars) {
 		registrars.forEach((registrar, metadata) ->
 				registrar.registerBeanDefinitions(metadata, this.registry, this.importBeanNameGenerator));
