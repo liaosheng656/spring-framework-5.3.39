@@ -414,6 +414,7 @@ class ConfigurationClassBeanDefinitionReader {
     //回调ImportBeanDefinitionRegistrar.registerBeanDefinitions
 	private void loadBeanDefinitionsFromRegistrars(Map<ImportBeanDefinitionRegistrar, AnnotationMetadata> registrars) {
 		registrars.forEach((registrar, metadata) ->
+                //回调ImportBeanDefinitionRegistrar.registerBeanDefinitions方法
 				registrar.registerBeanDefinitions(metadata, this.registry, this.importBeanNameGenerator));
 	}
 

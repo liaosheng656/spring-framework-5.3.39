@@ -82,6 +82,9 @@ abstract class ConfigurationClassUtils {
 	 * @param metadataReaderFactory the current factory in use by the caller
 	 * @return whether the candidate qualifies as (any kind of) configuration class
 	 */
+    //不是接口，并且含有这些注解@Component、@ComponentScan、
+    // @Import、@ImportResource、@Bean
+    //@Configuration
 	public static boolean checkConfigurationClassCandidate(
 			BeanDefinition beanDef, MetadataReaderFactory metadataReaderFactory) {
 
@@ -138,7 +141,10 @@ abstract class ConfigurationClassUtils {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
         //没有设置代理，设置为lite
-		else if (config != null || isConfigurationCandidate(metadata)) {
+		else if (config != null ||
+                //是否可以成为配置类，
+                // 不是接口，并且含有这些注解@Component、@ComponentScan、@Import、@ImportResource、@Bean
+                isConfigurationCandidate(metadata)) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 		}
 		else {
@@ -163,6 +169,7 @@ abstract class ConfigurationClassUtils {
 	 * @return {@code true} if the given class is to be registered for
 	 * configuration class processing; {@code false} otherwise
 	 */
+    //不是接口，并且含有这些注解@Component、@ComponentScan、@Import、@ImportResource、@Bean
 	public static boolean isConfigurationCandidate(AnnotationMetadata metadata) {
 		// Do not consider an interface or an annotation...
 		//如果是个接口，是不能成为bean定义的

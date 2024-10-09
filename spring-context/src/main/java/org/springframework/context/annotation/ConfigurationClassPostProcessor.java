@@ -231,6 +231,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 	/**
 	 * Derive further bean definitions from the configuration classes in the registry.
+     * 解析/扫描BeanDefinition
 	 */
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
@@ -244,8 +245,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 					"postProcessBeanFactory already called on this post-processor against " + registry);
 		}
 		this.registriesPostProcessed.add(registryId);
-        logger.info("调用processConfigBeanDefinitions()方法，类 = "+this.getClass().getName());
+        logger.info("解析/扫描BeanDefinition，调用processConfigBeanDefinitions()方法，类 = "+this.getClass().getName());
         logger.info("registry类 = "+registry.getClass().getName());
+        //解析/扫描BeanDefinition
 		processConfigBeanDefinitions(registry);
 	}
 
@@ -274,6 +276,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	/**
 	 * Build and validate a configuration model based on the registry of
 	 * {@link Configuration} classes.
+     * 重要
+     * 解析/扫描BeanDefinition
 	 */
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
 		List<BeanDefinitionHolder> configCandidates = new ArrayList<>();
@@ -365,19 +369,30 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			alreadyParsed.addAll(configClasses);
 			processConfig.tag("classCount", () -> String.valueOf(configClasses.size())).end();
 
+            //清空已经解析过的配置类
 			candidates.clear();
+            //如果BeanDefinition数量大于已经解析的数量，可能在注册BeanDefinition，回调时又注册生成了新的BeanDefinition
+            //这些新加进来的BeanDefinition也要解析，防止漏网之鱼
 			if (registry.getBeanDefinitionCount() > candidateNames.length) {
 				String[] newCandidateNames = registry.getBeanDefinitionNames();
 				Set<String> oldCandidateNames = new HashSet<>(Arrays.asList(candidateNames));
+                //已经解析过的配置类
 				Set<String> alreadyParsedClasses = new HashSet<>();
 				for (ConfigurationClass configurationClass : alreadyParsed) {
 					alreadyParsedClasses.add(configurationClass.getMetadata().getClassName());
 				}
 				for (String candidateName : newCandidateNames) {
+                    //比对了一下是不是新加进来的BeanDefinition
 					if (!oldCandidateNames.contains(candidateName)) {
 						BeanDefinition bd = registry.getBeanDefinition(candidateName);
+                        //判断可以不可以成为配置类
+                        //不是接口，并且含有这些注解@Component、@ComponentScan、
+                        // @Import、@ImportResource、@Bean
+                        //@Configuration
 						if (ConfigurationClassUtils.checkConfigurationClassCandidate(bd, this.metadataReaderFactory) &&
-								!alreadyParsedClasses.contains(bd.getBeanClassName())) {
+								//没有被解析过
+                                !alreadyParsedClasses.contains(bd.getBeanClassName())) {
+                            //加进去，走解析配置类
 							candidates.add(new BeanDefinitionHolder(bd, candidateName));
 						}
 					}
@@ -388,13 +403,17 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		while (!candidates.isEmpty());
 
 		// Register the ImportRegistry as a bean in order to support ImportAware @Configuration classes
-		if (sbr != null && !sbr.containsSingleton(IMPORT_REGISTRY_BEAN_NAME)) {
+		//将ImportRegistry注册为bean，以便支持ImportAware @ Configuration类
+        if (sbr != null && !sbr.containsSingleton(IMPORT_REGISTRY_BEAN_NAME)) {
 			sbr.registerSingleton(IMPORT_REGISTRY_BEAN_NAME, parser.getImportRegistry());
+            logger.info("将ImportRegistry注册为bean，以便支持ImportAware @Configuration类");
 		}
 
+        //为true
 		if (this.metadataReaderFactory instanceof CachingMetadataReaderFactory) {
 			// Clear cache in externally provided MetadataReaderFactory; this is a no-op
 			// for a shared cache since it'll be cleared by the ApplicationContext.
+            //清除缓存
 			((CachingMetadataReaderFactory) this.metadataReaderFactory).clearCache();
 		}
 	}
