@@ -78,7 +78,9 @@ final class PostProcessorRegistrationDelegate {
 
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
+            //普通的BeanFactoryPostProcessor，没有带注册bean功能的
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
+            //有注册bean定义功能的BeanFactoryPostProcessor
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
 
 			for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
@@ -155,12 +157,20 @@ final class PostProcessorRegistrationDelegate {
 			}
 
 			// Now, invoke the postProcessBeanFactory callback of all processors handled so far.
+            /**
+             * 回调BeanFactoryPostProcessor.postProcessBeanFactory方法
+             */
+            //有注册bean定义功能的BeanFactoryPostProcessor
 			invokeBeanFactoryPostProcessors(registryProcessors, beanFactory);
+            //普通的BeanFactoryPostProcessor，没有带注册bean功能的
 			invokeBeanFactoryPostProcessors(regularPostProcessors, beanFactory);
 		}
 
 		else {
 			// Invoke factory processors registered with the context instance.
+            //使用功能齐全/默认的beanFactory，是DefaultListableBeanFactory是带注册带注册bean功能的
+            //所以开发一般不会到这里
+            // 普通的BeanFactoryPostProcessor，没有带注册bean功能的
 			invokeBeanFactoryPostProcessors(beanFactoryPostProcessors, beanFactory);
 		}
 
@@ -329,12 +339,14 @@ final class PostProcessorRegistrationDelegate {
 	/**
 	 * Invoke the given BeanFactoryPostProcessor beans.
 	 */
+    //回调BeanFactoryPostProcessor.postProcessBeanFactory方法
 	private static void invokeBeanFactoryPostProcessors(
 			Collection<? extends BeanFactoryPostProcessor> postProcessors, ConfigurableListableBeanFactory beanFactory) {
 
 		for (BeanFactoryPostProcessor postProcessor : postProcessors) {
 			StartupStep postProcessBeanFactory = beanFactory.getApplicationStartup().start("spring.context.bean-factory.post-process")
 					.tag("postProcessor", postProcessor::toString);
+            //回调BeanFactoryPostProcessor.postProcessBeanFactory方法
 			postProcessor.postProcessBeanFactory(beanFactory);
 			postProcessBeanFactory.end();
 		}
