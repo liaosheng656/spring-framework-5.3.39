@@ -117,7 +117,7 @@ final class PostProcessorRegistrationDelegate {
             //排序
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
 			registryProcessors.addAll(currentRegistryProcessors);
-            //调用bean定义/工厂后置处理器
+            //调用bean定义/工厂后置处理器，先调用PriorityOrdered接口的
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry, beanFactory.getApplicationStartup());
 			currentRegistryProcessors.clear();
 
@@ -131,6 +131,7 @@ final class PostProcessorRegistrationDelegate {
 			}
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
 			registryProcessors.addAll(currentRegistryProcessors);
+            //再调用Ordered接口的
             //先调内部/内置的ConfigurationClassPostProcessor，完成主要的扫描（成为BeanDefinition）工作
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry, beanFactory.getApplicationStartup());
 			currentRegistryProcessors.clear();
@@ -151,6 +152,7 @@ final class PostProcessorRegistrationDelegate {
 				}
 				sortPostProcessors(currentRegistryProcessors, beanFactory);
 				registryProcessors.addAll(currentRegistryProcessors);
+                //没有实现PriorityOrdered接口，也没有实现Ordered接口的
                 //调用/回调自定义（可以注册bean定义的）BeanDefinitionRegistryPostProcessor
 				invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry, beanFactory.getApplicationStartup());
 				currentRegistryProcessors.clear();
