@@ -17,8 +17,8 @@ public class ImportInitTrue implements TestComponentsService {
 		System.out.println("调用ImportInitTrueTest01方法");
 	}
 
-    @Bean("studentService02")
-    public StudentService studentService01(){
+    @Bean("studentService011")
+    public StudentService studentService011(){
         return new StudentService();
     }
 }

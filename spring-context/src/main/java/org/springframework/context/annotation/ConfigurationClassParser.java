@@ -181,9 +181,11 @@ class ConfigurationClassParser {
 					parse(((AnnotatedBeanDefinition) bd).getMetadata(), holder.getBeanName());
 				}
 				else if (bd instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) bd).hasBeanClass()) {
-					parse(((AbstractBeanDefinition) bd).getBeanClass(), holder.getBeanName());
+					//这里的解析流程，基本和上面的一样的
+                    parse(((AbstractBeanDefinition) bd).getBeanClass(), holder.getBeanName());
 				}
 				else {
+                    //这里的解析流程，基本和上面的一样的--一般不走这里
 					parse(bd.getBeanClassName(), holder.getBeanName());
 				}
 			}

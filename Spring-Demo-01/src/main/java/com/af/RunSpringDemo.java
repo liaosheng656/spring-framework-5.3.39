@@ -19,7 +19,8 @@ import java.io.IOException;
 //@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)//CGLIB����
 @Configuration
 @ComponentScan("com.af")
-@MyAnnotation(init = false)
+//@MyAnnotation(init = false)
+@MyAnnotation(init = true)
 public class RunSpringDemo {
 
 	/**
