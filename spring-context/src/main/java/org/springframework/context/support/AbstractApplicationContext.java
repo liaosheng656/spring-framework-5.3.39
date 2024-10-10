@@ -577,10 +577,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
                 logger.info("BeanFactory前置工作都做好了，准备执行");
 				// Invoke factory processors registered as beans in the context.
-                logger.info("开始回调/执行BeanFactoryPostProcessors方法，然后加载时间编织器,不懂啥玩意");
-				invokeBeanFactoryPostProcessors(beanFactory);
+                logger.info("开始解析配置类，扫描bean定义、开始回调/执行BeanFactoryPostProcessors方法，然后加载时间编织器,不懂啥玩意");
+				//始解析配置类，扫描bean定义、回调/执行BeanFactoryPostProcessors（bean工厂后置处理器）方法
+                invokeBeanFactoryPostProcessors(beanFactory);
 				// Register bean processors that intercept bean creation.
+                //注册bean的后置处理器
+                // bean工厂添加内置/自定义BeanPostProcessor-并且可能创建bean返回实例，加到beanFactory中
+                //内置两个bean的后置处理器、BeanPostProcessors检查器和监听器
 				registerBeanPostProcessors(beanFactory);
+                logger.info("注册bean的后置处理器/bean工厂添加内置/自定义BeanPostProcessor-并且可能创建bean返回实例，加到beanFactory中,内置两个bean的后置处理器--完成");
 				beanPostProcess.end();
 
 				// Initialize message source for this context.
@@ -778,7 +783,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
         //这里还有一行-----开始回调/执行BeanFactoryPostProcessors方法--Alt + F8可以看方法执行值
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
-
+        System.out.println("====解析配置类完成，扫描bean定义完成，开始回调/执行BeanFactoryPostProcessors完成====");
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
 		// (e.g. through an @Bean method registered by ConfigurationClassPostProcessor)
 		if (!NativeDetector.inNativeImage() && beanFactory.getTempClassLoader() == null &&
@@ -794,7 +799,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * respecting explicit order if given.
 	 * <p>Must be called before any instantiation of application beans.
 	 */
+    //注册bean的后置处理器/bean工厂添加BeanPostProcessor-并且可能创建bean返回实例，加到beanFactory中
+    //内置两个bean的后置处理器
 	protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+        //注册bean的后置处理器/bean工厂添加BeanPostProcessor-并且可能创建bean返回实例，加到beanFactory中
+        //内置两个bean的后置处理器
 		PostProcessorRegistrationDelegate.registerBeanPostProcessors(beanFactory, this);
 	}
 

@@ -213,6 +213,7 @@ final class PostProcessorRegistrationDelegate {
 
 		// First, invoke the BeanFactoryPostProcessors that implement PriorityOrdered.
 		sortPostProcessors(priorityOrderedPostProcessors, beanFactory);
+        //实现PriorityOrdered接口的PostProcessors回调
 		invokeBeanFactoryPostProcessors(priorityOrderedPostProcessors, beanFactory);
 
 		// Next, invoke the BeanFactoryPostProcessors that implement Ordered.
@@ -221,6 +222,7 @@ final class PostProcessorRegistrationDelegate {
 			orderedPostProcessors.add(beanFactory.getBean(postProcessorName, BeanFactoryPostProcessor.class));
 		}
 		sortPostProcessors(orderedPostProcessors, beanFactory);
+        //实现Ordered接口的PostProcessors回调
 		invokeBeanFactoryPostProcessors(orderedPostProcessors, beanFactory);
 
 		// Finally, invoke all other BeanFactoryPostProcessors.
@@ -236,6 +238,13 @@ final class PostProcessorRegistrationDelegate {
 		beanFactory.clearMetadataCache();
 	}
 
+    /**
+     * 注册bean的后置处理器
+     * 内置两个bean的后置处理器
+     * bean工厂添加BeanPostProcessor-并且可能创建bean返回实例，加到beanFactory中
+     * @param beanFactory
+     * @param applicationContext
+     */
 	public static void registerBeanPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
 
@@ -252,25 +261,38 @@ final class PostProcessorRegistrationDelegate {
 		// to ensure that your proposal does not result in a breaking change:
 		// https://github.com/spring-projects/spring-framework/issues?q=PostProcessorRegistrationDelegate+is%3Aclosed+label%3A%22status%3A+declined%22
 
+        //获取bean的后置处理器
+        //内置的bean的后置处理器AutowiredAnnotationProcessor
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 
 		// Register BeanPostProcessorChecker that logs an info message when
 		// a bean is created during BeanPostProcessor instantiation, i.e. when
 		// a bean is not eligible for getting processed by all BeanPostProcessors.
 		int beanProcessorTargetCount = beanFactory.getBeanPostProcessorCount() + 1 + postProcessorNames.length;
+        System.out.println("内置一个BeanPostProcessor（bean后置处理器）----BeanPostProcessorChecker");
 		beanFactory.addBeanPostProcessor(new BeanPostProcessorChecker(beanFactory, beanProcessorTargetCount));
 
 		// Separate between BeanPostProcessors that implement PriorityOrdered,
 		// Ordered, and the rest.
+        //priorityOrdered排序的后置处理器
 		List<BeanPostProcessor> priorityOrderedPostProcessors = new ArrayList<>();
+        //内部的后置处理器
 		List<BeanPostProcessor> internalPostProcessors = new ArrayList<>();
+        //Ordered排序的后置处理器
 		List<String> orderedPostProcessorNames = new ArrayList<>();
+        //没有排序的后置处理器
 		List<String> nonOrderedPostProcessorNames = new ArrayList<>();
+
+        //bean的后置处理器，排序的、没有排序的
+        //一般只有一个内置的bean的后置处理器AutowiredAnnotationBeanPostProcessor
 		for (String ppName : postProcessorNames) {
+            //默认的bean的后置处理器实现了PriorityOrdered接口的
 			if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
+                //创建bean，获取实例
 				BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
 				priorityOrderedPostProcessors.add(pp);
 				if (pp instanceof MergedBeanDefinitionPostProcessor) {
+                    //内部的bean的后置处理器
 					internalPostProcessors.add(pp);
 				}
 			}
@@ -284,38 +306,49 @@ final class PostProcessorRegistrationDelegate {
 
 		// First, register the BeanPostProcessors that implement PriorityOrdered.
 		sortPostProcessors(priorityOrderedPostProcessors, beanFactory);
+        //bean工厂添加BeanPostProcessor-1
 		registerBeanPostProcessors(beanFactory, priorityOrderedPostProcessors);
 
 		// Next, register the BeanPostProcessors that implement Ordered.
 		List<BeanPostProcessor> orderedPostProcessors = new ArrayList<>(orderedPostProcessorNames.size());
 		for (String ppName : orderedPostProcessorNames) {
+            //创建bean，获取实例
 			BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
 			orderedPostProcessors.add(pp);
 			if (pp instanceof MergedBeanDefinitionPostProcessor) {
+                //内部的bean的后置处理器
 				internalPostProcessors.add(pp);
 			}
 		}
 		sortPostProcessors(orderedPostProcessors, beanFactory);
+        //bean工厂添加BeanPostProcessor-2
 		registerBeanPostProcessors(beanFactory, orderedPostProcessors);
 
 		// Now, register all regular BeanPostProcessors.
+        //没有排序的beanPostProcessors
 		List<BeanPostProcessor> nonOrderedPostProcessors = new ArrayList<>(nonOrderedPostProcessorNames.size());
 		for (String ppName : nonOrderedPostProcessorNames) {
+            //创建bean，获取实例
 			BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
 			nonOrderedPostProcessors.add(pp);
 			if (pp instanceof MergedBeanDefinitionPostProcessor) {
+                //内部的bean的后置处理器
 				internalPostProcessors.add(pp);
 			}
 		}
+        //bean工厂添加BeanPostProcessor-3
 		registerBeanPostProcessors(beanFactory, nonOrderedPostProcessors);
 
 		// Finally, re-register all internal BeanPostProcessors.
 		sortPostProcessors(internalPostProcessors, beanFactory);
+        //bean工厂添加BeanPostProcessor-4
 		registerBeanPostProcessors(beanFactory, internalPostProcessors);
 
 		// Re-register post-processor for detecting inner beans as ApplicationListeners,
 		// moving it to the end of the processor chain (for picking up proxies etc).
-		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(applicationContext));
+        //加一个内置的应用程序监听器检测器ApplicationListenerDetector
+        System.out.println("内置一个BeanPostProcessor（bean后置处理器）----应用程序监听器检测器ApplicationListenerDetector");
+        beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(applicationContext));
 	}
 
 	private static void sortPostProcessors(List<?> postProcessors, ConfigurableListableBeanFactory beanFactory) {
@@ -368,15 +401,20 @@ final class PostProcessorRegistrationDelegate {
 	/**
 	 * Register the given BeanPostProcessor beans.
 	 */
+    //bean工厂添加BeanPostProcessor
 	private static void registerBeanPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanPostProcessor> postProcessors) {
 
+        //默认的beanFactory符合这个条件
 		if (beanFactory instanceof AbstractBeanFactory) {
 			// Bulk addition is more efficient against our CopyOnWriteArrayList there
+            //bean工厂添加BeanPostProcessor
 			((AbstractBeanFactory) beanFactory).addBeanPostProcessors(postProcessors);
 		}
 		else {
+            //可能以前的功能或自定义的BeanPostProcessor会到这里
 			for (BeanPostProcessor postProcessor : postProcessors) {
+                //bean工厂添加BeanPostProcessor
 				beanFactory.addBeanPostProcessor(postProcessor);
 			}
 		}
