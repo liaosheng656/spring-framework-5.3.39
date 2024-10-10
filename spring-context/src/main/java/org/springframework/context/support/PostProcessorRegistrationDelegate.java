@@ -138,6 +138,7 @@ final class PostProcessorRegistrationDelegate {
 
 			// Finally, invoke all other BeanDefinitionRegistryPostProcessors until no further ones appear.
 			boolean reiterate = true;
+            //这里不断循环，如果PostProcessor不断的注册PostProcessor对应的bean定义，那就会一直调用
 			while (reiterate) {
 				reiterate = false;
                 //获取所有的BeanDefinitionRegistryPostProcessor
@@ -150,6 +151,9 @@ final class PostProcessorRegistrationDelegate {
 						reiterate = true;
 					}
 				}
+                if(reiterate){
+                    System.out.println("这里不断循环，如果PostProcessor不断的注册PostProcessor对应的bean定义，那就会一直调用");
+                }
 				sortPostProcessors(currentRegistryProcessors, beanFactory);
 				registryProcessors.addAll(currentRegistryProcessors);
                 //没有实现PriorityOrdered接口，也没有实现Ordered接口的
@@ -178,6 +182,8 @@ final class PostProcessorRegistrationDelegate {
 
 		// Do not initialize FactoryBeans here: We need to leave all regular beans
 		// uninitialized to let the bean factory post-processors apply to them!
+        //再获取一次BeanFactoryPostProcessor，避免有漏网之鱼
+        // 因为BeanFactoryPostProcessor也可能加入新的BeanFactoryPostProcessor
 		String[] postProcessorNames =
 				beanFactory.getBeanNamesForType(BeanFactoryPostProcessor.class, true, false);
 
@@ -187,16 +193,20 @@ final class PostProcessorRegistrationDelegate {
 		List<String> orderedPostProcessorNames = new ArrayList<>();
 		List<String> nonOrderedPostProcessorNames = new ArrayList<>();
 		for (String ppName : postProcessorNames) {
+            //比对后置处理是否已经处理过了
 			if (processedBeans.contains(ppName)) {
 				// skip - already processed in first phase above
 			}
+            //没有处理过，实现了PriorityOrdered接口
 			else if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 				priorityOrderedPostProcessors.add(beanFactory.getBean(ppName, BeanFactoryPostProcessor.class));
 			}
+            //没有处理过，实现了Ordered接口
 			else if (beanFactory.isTypeMatch(ppName, Ordered.class)) {
 				orderedPostProcessorNames.add(ppName);
 			}
 			else {
+                //没有处理过，没有实现PriorityOrdered接口、也没有实现Ordered接口
 				nonOrderedPostProcessorNames.add(ppName);
 			}
 		}
@@ -218,6 +228,7 @@ final class PostProcessorRegistrationDelegate {
 		for (String postProcessorName : nonOrderedPostProcessorNames) {
 			nonOrderedPostProcessors.add(beanFactory.getBean(postProcessorName, BeanFactoryPostProcessor.class));
 		}
+        //执行回调
 		invokeBeanFactoryPostProcessors(nonOrderedPostProcessors, beanFactory);
 
 		// Clear cached merged bean definitions since the post-processors might have
