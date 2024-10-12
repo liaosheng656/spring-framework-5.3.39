@@ -590,12 +590,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// Initialize message source for this context.
 				initMessageSource();
-
+                System.out.println("initMessageSource()，这里可以实现国际化");
 				// Initialize event multicaster for this context.
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
+                //初始化特定上下文子类中的其他特殊beans。
 				onRefresh();
+                System.out.println("初始化特定上下文子类中的其他特殊beans---完成，" +
+                        "SpringBoot重写了这个方法用于初始化Tomcat容器");
 
 				// Check for listener beans and register them.
 				registerListeners();
@@ -831,9 +834,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 		else {
 			// Use empty MessageSource to be able to accept getMessage calls.
+            //使用空MessageSource能够接受getMessage调用
 			DelegatingMessageSource dms = new DelegatingMessageSource();
 			dms.setParentMessageSource(getInternalParentMessageSource());
 			this.messageSource = dms;
+            //注册messageSource
 			beanFactory.registerSingleton(MESSAGE_SOURCE_BEAN_NAME, this.messageSource);
 			if (logger.isTraceEnabled()) {
 				logger.trace("No '" + MESSAGE_SOURCE_BEAN_NAME + "' bean, using [" + this.messageSource + "]");
