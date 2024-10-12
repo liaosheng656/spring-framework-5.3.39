@@ -108,6 +108,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private final Map<String, Set<String>> containedBeanMap = new ConcurrentHashMap<>(16);
 
 	/** Map between dependent bean names: bean name to Set of dependent bean names. */
+    //bean名称到依赖bean名称集
 	private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<>(64);
 
 	/** Map between depending bean names: bean name to Set of bean names for the bean's dependencies. */
@@ -176,6 +177,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param allowEarlyReference whether early references should be created or not
 	 * @return the registered singleton object, or {@code null} if none found
 	 */
+    //allowEarlyReference 是否早期引用
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		// Quick check for existing instance without full singleton lock
@@ -410,13 +412,17 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param beanName the name of the bean
 	 * @param dependentBeanName the name of the dependent bean
 	 */
+    //dependentBeanName 依赖的bean或真正创建的bean
 	public void registerDependentBean(String beanName, String dependentBeanName) {
+        //看看是不是别名，从别名获取真正的bean名字
 		String canonicalName = canonicalName(beanName);
 
 		synchronized (this.dependentBeanMap) {
 			Set<String> dependentBeans =
 					this.dependentBeanMap.computeIfAbsent(canonicalName, k -> new LinkedHashSet<>(8));
-			if (!dependentBeans.add(dependentBeanName)) {
+			//是被依赖的bean或真正创建的bean
+            //说明beanName--->依赖dependentBeanName？？？？
+            if (!dependentBeans.add(dependentBeanName)) {
 				return;
 			}
 		}
@@ -424,7 +430,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		synchronized (this.dependenciesForBeanMap) {
 			Set<String> dependenciesForBean =
 					this.dependenciesForBeanMap.computeIfAbsent(dependentBeanName, k -> new LinkedHashSet<>(8));
-			dependenciesForBean.add(canonicalName);
+			//如果可以加进去，说明dependentBeanName---->beanName？？？？？
+            dependenciesForBean.add(canonicalName);
 		}
 	}
 

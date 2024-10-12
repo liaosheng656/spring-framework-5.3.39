@@ -577,6 +577,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
             //非别名
 			if (!isAlias(beanName)) {
 				try {
+                    //获取definition
 					RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
 					// Only check bean definition if it is complete.
 					if (!mbd.isAbstract() && (allowEagerInit ||
@@ -933,6 +934,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return (this.configurationFrozen || super.isBeanEligibleForMetadataCaching(beanName));
 	}
 
+    /**
+     *核心来了
+     *(最重要)初始化非懒加载的单例bean
+     *bean的创建及生命周期、构造方法推断、循环依赖、
+     *bean的后置处理器、AOP、事务来了
+     * @throws BeansException
+     */
 	@Override
 	public void preInstantiateSingletons() throws BeansException {
 		if (logger.isTraceEnabled()) {
@@ -944,10 +952,14 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
 		// Trigger initialization of all non-lazy singleton beans...
+        //触发所有非懒惰单例beans的初始化...
 		for (String beanName : beanNames) {
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+            //非懒加载的单例bean、非抽象
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+                //是FactoryBean
 				if (isFactoryBean(beanName)) {
+                    //FactoryBean----bean名字前面加个&
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
 						FactoryBean<?> factory = (FactoryBean<?>) bean;
