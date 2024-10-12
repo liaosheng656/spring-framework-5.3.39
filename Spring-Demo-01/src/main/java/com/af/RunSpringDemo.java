@@ -3,14 +3,20 @@ package com.af;
 
 //import lombok.extern.slf4j.Slf4j;
 import com.af.annotation.MyAnnotation;
+import com.af.event.ApplicationContextEventTest01;
 import com.af.service.HelloService;
 import com.af.service.PerSonService;
 import com.af.service.StudentService;
 import com.alibaba.fastjson2.JSONObject;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.*;
+import org.springframework.context.event.ApplicationContextEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Collection;
 
 //@Configuration
 /**
@@ -58,6 +64,14 @@ public class RunSpringDemo {
             if(helloServiceObj != null){
                 HelloService helloService = (HelloService) helloServiceObj;
                 helloService.HelloServiceTest();
+            }
+            Collection<ApplicationListener<?>> listenerList = context.getApplicationListeners();
+            if(listenerList != null){
+                for (ApplicationListener listener:listenerList) {
+                    listener.onApplicationEvent(new ApplicationContextEventTest01(context,"发条信息"));
+                    listener.onApplicationEvent(new ContextRefreshedEvent(context));
+
+                }
             }
             String[] singletonNames = context.getBeanFactory().getSingletonNames();
             String json = JSONObject.toJSONString(singletonNames);

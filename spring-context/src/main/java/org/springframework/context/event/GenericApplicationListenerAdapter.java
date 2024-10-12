@@ -41,8 +41,14 @@ public class GenericApplicationListenerAdapter implements GenericApplicationList
 	private static final Map<Class<?>, ResolvableType> eventTypeCache = new ConcurrentReferenceHashMap<>();
 
 
+    /**
+     * Listener监听器
+     */
 	private final ApplicationListener<ApplicationEvent> delegate;
 
+    /**
+     * Listener监听器泛型
+     */
 	@Nullable
 	private final ResolvableType declaredEventType;
 
@@ -55,7 +61,10 @@ public class GenericApplicationListenerAdapter implements GenericApplicationList
 	public GenericApplicationListenerAdapter(ApplicationListener<?> delegate) {
 		Assert.notNull(delegate, "Delegate listener must not be null");
 		this.delegate = (ApplicationListener<ApplicationEvent>) delegate;
+        //
+        System.out.println("解析监听器泛型类型");
 		this.declaredEventType = resolveDeclaredEventType(this.delegate);
+        System.out.println("解析监听器泛型类型declaredEventType = "+declaredEventType.getClass().getName());
 	}
 
 
@@ -64,6 +73,11 @@ public class GenericApplicationListenerAdapter implements GenericApplicationList
 		this.delegate.onApplicationEvent(event);
 	}
 
+    /**
+     * 判断监听器event事件类型是否适配或符合
+     * @param eventType the event type (never {@code null})
+     * @return
+     */
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean supportsEventType(ResolvableType eventType) {
