@@ -252,7 +252,8 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
-		InjectionMetadata metadata = findAutowiringMetadata(beanName, beanType, null);
+		//@Autowired、@Value查询这些注解
+        InjectionMetadata metadata = findAutowiringMetadata(beanName, beanType, null);
 		metadata.checkConfigMembers(beanDefinition);
 	}
 
@@ -459,7 +460,9 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 					if (metadata != null) {
 						metadata.clear(pvs);
 					}
+                    //@Autowired、@Value查询这些注解
 					metadata = buildAutowiringMetadata(clazz);
+                    //存起来
 					this.injectionMetadataCache.put(cacheKey, metadata);
 				}
 			}
@@ -468,6 +471,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	}
 
 	private InjectionMetadata buildAutowiringMetadata(Class<?> clazz) {
+        //@Autowired、@Value查询这些注解
 		if (!AnnotationUtils.isCandidateClass(clazz, this.autowiredAnnotationTypes)) {
 			return InjectionMetadata.EMPTY;
 		}
