@@ -27,6 +27,7 @@ import java.util.Collection;
 @ComponentScan("com.af")
 //@MyAnnotation(init = false)
 @MyAnnotation(init = true)
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class RunSpringDemo {
 
 	/**

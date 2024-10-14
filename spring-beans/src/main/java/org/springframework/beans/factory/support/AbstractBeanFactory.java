@@ -1001,6 +1001,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			BeanPostProcessorCache bppCache = this.beanPostProcessorCache;
 			if (bppCache == null) {
 				bppCache = new BeanPostProcessorCache();
+                //beanPostProcessors遍历
 				for (BeanPostProcessor bpp : this.beanPostProcessors) {
 					if (bpp instanceof InstantiationAwareBeanPostProcessor) {
 						bppCache.instantiationAware.add((InstantiationAwareBeanPostProcessor) bpp);

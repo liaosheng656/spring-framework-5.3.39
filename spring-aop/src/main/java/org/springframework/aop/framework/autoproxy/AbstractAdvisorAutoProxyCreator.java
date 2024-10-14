@@ -70,6 +70,15 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	}
 
 
+    /**
+     * 找AOP通知
+     * @param beanClass the class of the bean to advise
+     * @param beanName the name of the bean
+     * @param targetSource the TargetSource returned by the
+     * {@link #getCustomTargetSource} method: may be ignored.
+     * Will be {@code null} if no custom target source is in use.
+     * @return
+     */
 	@Override
 	@Nullable
 	protected Object[] getAdvicesAndAdvisorsForBean(
@@ -93,6 +102,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 * @see #extendAdvisors
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
+        //
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
 		extendAdvisors(eligibleAdvisors);
