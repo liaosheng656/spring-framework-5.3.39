@@ -70,6 +70,7 @@ public class RunSpringDemo {
             if(listenerList != null){
                 for (ApplicationListener listener:listenerList) {
                     listener.onApplicationEvent(new ApplicationContextEventTest01(context,"发条信息"));
+                    //启动完，发个事件
                     listener.onApplicationEvent(new ContextRefreshedEvent(context));
 
                 }
