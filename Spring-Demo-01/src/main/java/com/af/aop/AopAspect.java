@@ -31,7 +31,7 @@ public class AopAspect {
      * @param joinPoint 连接点
      */
     @Before("aopCut()")
-    public void cutProcess(JoinPoint joinPoint) {
+    public void before(JoinPoint joinPoint) {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         System.out.println("注解方式AOP开始拦截, 当前拦截的方法名: " + method.getName());

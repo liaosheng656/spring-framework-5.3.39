@@ -79,11 +79,13 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
      * Will be {@code null} if no custom target source is in use.
      * @return
      */
+    //创建代理看看有没有AOP通知
 	@Override
 	@Nullable
 	protected Object[] getAdvicesAndAdvisorsForBean(
 			Class<?> beanClass, String beanName, @Nullable TargetSource targetSource) {
 
+        //创建代理看看有没有AOP通知
 		List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);
 		if (advisors.isEmpty()) {
 			return DO_NOT_PROXY;
@@ -102,7 +104,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 * @see #extendAdvisors
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
-        //
+        //找AOP，@Aspect对应的类，和对前置、后置、环绕等通知进行封装
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
 		extendAdvisors(eligibleAdvisors);

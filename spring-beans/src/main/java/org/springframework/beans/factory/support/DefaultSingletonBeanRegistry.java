@@ -135,11 +135,16 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param beanName the name of the bean
 	 * @param singletonObject the singleton object
 	 */
+    //bean加入单例池中
 	protected void addSingleton(String beanName, Object singletonObject) {
 		synchronized (this.singletonObjects) {
+            //加入单例池中，1级缓存
 			this.singletonObjects.put(beanName, singletonObject);
+            //移除3级缓存（一段逻辑/一个方法）
 			this.singletonFactories.remove(beanName);
+            //移除2级缓存（bean的早期对象）
 			this.earlySingletonObjects.remove(beanName);
+            //已注册的bean名称
 			this.registeredSingletons.add(beanName);
 		}
 	}
@@ -213,11 +218,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * with, if necessary
 	 * @return the registered singleton object
 	 */
+    //获取bean，获取bean实例，调用singletonFactory.getObject()即调用外层的createBean()逻辑返回bean实例
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(beanName, "Bean name must not be null");
 		synchronized (this.singletonObjects) {
 			Object singletonObject = this.singletonObjects.get(beanName);
 			if (singletonObject == null) {
+                //是否正在销毁
 				if (this.singletonsCurrentlyInDestruction) {
 					throw new BeanCreationNotAllowedException(beanName,
 							"Singleton bean creation not allowed while singletons of this factory are in destruction " +
@@ -226,6 +233,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
+                //准备开始创建bean，所以把bean名字设置进去，说明这个bean正在创建
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
@@ -233,7 +241,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
+                    //singletonFactory是个函数式接口，这里才会执行外面逻辑
 					singletonObject = singletonFactory.getObject();
+                    //新的bean
 					newSingleton = true;
 				}
 				catch (IllegalStateException ex) {
@@ -256,8 +266,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}
+                    //走到这里一般说明bean已经创建完成，所以把bean创建状态删除（bean创建完成了）
 					afterSingletonCreation(beanName);
 				}
+                //新的bean，则加入单例池中
 				if (newSingleton) {
 					addSingleton(beanName, singletonObject);
 				}
