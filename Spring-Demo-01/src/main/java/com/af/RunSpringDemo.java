@@ -48,7 +48,8 @@ public class RunSpringDemo {
 		//扫描逻辑（关键）ConfigurationClassUtils.isConfigurationCandidate
 		//判断扫描的文件是否可以成为bean定义ClassPathScanningCandidateComponentProvider.isCandidateComponent
         //@Component、ComponentScan、Import、ImportResource、@Configuration 有这些注解的都可以为配置类
-        //无配置文件启动
+        //核心创建bean、循环依赖org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean
+		//无配置文件启动
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(RunSpringDemo.class);
         try{
             Object studentService = context.getBean("studentService");

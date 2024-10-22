@@ -586,6 +586,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
                 //注册bean的后置处理器
                 // bean工厂添加内置/自定义BeanPostProcessor-并且可能创建bean返回实例，加到beanFactory中
                 //内置两个bean的后置处理器、BeanPostProcessors检查器和监听器
+				//开启AOP的BeanPostProcessors也在这里注册AnnotationAwareAspectJAutoProxyCreator
 				registerBeanPostProcessors(beanFactory);
                 logger.info("注册bean的后置处理器/bean工厂添加内置/自定义BeanPostProcessor-并且可能创建bean返回实例，加到beanFactory中,内置两个bean的后置处理器--完成");
 				beanPostProcess.end();
