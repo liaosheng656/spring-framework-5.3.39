@@ -1960,6 +1960,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * Add the given bean to the list of disposable beans in this factory,
 	 * registering its DisposableBean interface and/or the given destroy method
 	 * to be called on factory shutdown (if applicable). Only applies to singletons.
+     * 将给定的bean添加到该工厂的可处理bean列表中
+     * 注册其DisposableBean接口和/或给定的销毁方法
+     * 在工厂关闭时调用(如果适用)。仅适用于单例bean
 	 * @param beanName the name of the bean
 	 * @param bean the bean instance
 	 * @param mbd the bean definition for the bean
