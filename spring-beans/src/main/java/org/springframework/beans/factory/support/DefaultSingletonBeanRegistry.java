@@ -243,7 +243,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				try {
                     //singletonFactory是个函数式接口，这里才会执行外面逻辑
 					singletonObject = singletonFactory.getObject();
-                    //新的bean
+                    //说明是新的bean，要加入单例池中
 					newSingleton = true;
 				}
 				catch (IllegalStateException ex) {

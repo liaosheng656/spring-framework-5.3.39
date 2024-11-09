@@ -132,7 +132,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	private ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
 	/** Whether to automatically try to resolve circular references between beans. */
-	private boolean allowCircularReferences = true;
+	//允许循环引用
+    private boolean allowCircularReferences = true;
 
 	/**
 	 * Whether to resort to injecting a raw bean instance in case of circular reference,
@@ -583,11 +584,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Instantiate the bean.
 		BeanWrapper instanceWrapper = null;
 		if (mbd.isSingleton()) {
-            //存在bean则获取，并删除缓存
+            logger.info("存在factoryBean则获取，并删除缓存,beanName="+beanName);
+            //存在factoryBean则获取，并删除缓存
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
+        //不是FactoryBean
 		if (instanceWrapper == null) {
             //实例化-这时还没有填充属性（初始化）
+            //FactoryBean不会实例化
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
 		Object bean = instanceWrapper.getWrappedInstance();
@@ -630,9 +634,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Initialize the bean instance.
 		Object exposedObject = bean;
 		try {
-            //填充属性
+            //填充属性-如果是factoryBean则会调bean的后置处理器（初始化之后方法）
 			populateBean(beanName, mbd, instanceWrapper);
-            //初始化bean
+            //初始化bean-会调初始化之前--初始后之后
+            //其实就是看看有没有设置初始化的方法
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
 		}
 		catch (Throwable ex) {
@@ -645,6 +650,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
+        //存在循环依赖
 		if (earlySingletonExposure) {
 			Object earlySingletonReference = getSingleton(beanName, false);
 			if (earlySingletonReference != null) {
@@ -674,6 +680,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Register bean as disposable.
 		try {
+            //将给定的bean添加到该工厂的可处理bean列表中
+            //注册其DisposableBean接口和/或给定的销毁方法
+            //在工厂关闭时调用(如果适用)。仅适用于单例bean
 			registerDisposableBeanIfNecessary(beanName, bean, mbd);
 		}
 		catch (BeanDefinitionValidationException ex) {
@@ -1812,11 +1821,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}, getAccessControlContext());
 		}
 		else {
+            //回调Aware方法
 			invokeAwareMethods(beanName, bean);
 		}
 
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
+            logger.info("bean初始化之前，beanName="+beanName);
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
@@ -1829,6 +1840,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					beanName, "Invocation of init method failed", ex);
 		}
 		if (mbd == null || !mbd.isSynthetic()) {
+            logger.info("bean初始化之后，beanName="+beanName);
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 
@@ -1884,6 +1896,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				}
 			}
 			else {
+                //属性填充之后-初始化之后，初始化之前
+                logger.info("属性填充之后-初始化之后，初始化之前，调用afterPropertiesSet()");
 				((InitializingBean) bean).afterPropertiesSet();
 			}
 		}

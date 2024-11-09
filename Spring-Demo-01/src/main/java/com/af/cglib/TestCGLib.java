@@ -27,7 +27,7 @@ public class TestCGLib implements MethodInterceptor {
 
         //这里写死，其实MyMapper是接口，接口代理，因为没有
         if(args[0].toString().equals("MyMapper")){
-            return "调用成功";
+            return "intercept-调用成功";
         }
 
         // 调用原始方法
