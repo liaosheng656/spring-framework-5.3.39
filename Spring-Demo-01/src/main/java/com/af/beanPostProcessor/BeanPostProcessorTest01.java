@@ -36,7 +36,9 @@ public class BeanPostProcessorTest01 implements BeanPostProcessor {
      */
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-
+        if(beanName.contains("factoryBean") ){
+            System.out.println(beanName);
+        }
         return bean;
     }
 }

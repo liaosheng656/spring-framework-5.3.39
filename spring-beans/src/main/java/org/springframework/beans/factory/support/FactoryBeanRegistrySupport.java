@@ -139,6 +139,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 			if (shouldPostProcess) {
 				try {
                     //回调BeanPostProcessors-初始化之后
+                    logger.info("获取FactoryBean实例后，到回调BeanPostProcessors-初始化之后");
 					object = postProcessObjectFromFactoryBean(object, beanName);
 				}
 				catch (Throwable ex) {
@@ -172,6 +173,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 			}
 			else {
                 //回调FactoryBean获取实例
+                logger.info("调用factoryBean的getObject方法");
 				object = factory.getObject();
 			}
 		}

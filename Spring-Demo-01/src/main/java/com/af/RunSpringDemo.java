@@ -32,7 +32,7 @@ public class RunSpringDemo {
 
 	/**
 	 * 内部类也可以被扫到
-	 * {@link org.springframework.context.annotation.ConfigurationClassParser#processMemberClasses
+	 * {@link org.springframework.context.annotation.ConfigurationClassParser#processMemberClasses}
 	 * (org.springframework.context.annotation.ConfigurationClass,
 	 * org.springframework.context.annotation.ConfigurationClassParser.SourceClass,
 	 * java.util.function.Predicate)}
@@ -48,9 +48,15 @@ public class RunSpringDemo {
 		//扫描逻辑（关键）ConfigurationClassUtils.isConfigurationCandidate
 		//判断扫描的文件是否可以成为bean定义ClassPathScanningCandidateComponentProvider.isCandidateComponent
         //@Component、ComponentScan、Import、ImportResource、@Configuration 有这些注解的都可以为配置类
-        //核心创建bean、循环依赖org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean
+        //核心创建bean、循环依赖
+        /**
+         * {@link org.springframework.beans.factory.support.AbstractBeanFactory#doGetBean}
+         * {@link  org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#createBean(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Object[])}
+         */
 		//无配置文件启动
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(RunSpringDemo.class);
+        Object bean = context.getBean("&factoryBeanTest01");
+        System.out.println(bean);
         try{
             Object studentService = context.getBean("studentService");
             if(studentService != null){
@@ -72,7 +78,7 @@ public class RunSpringDemo {
                 for (ApplicationListener listener:listenerList) {
                     listener.onApplicationEvent(new ApplicationContextEventTest01(context,"发条信息"));
                     //启动完，发个事件
-                    listener.onApplicationEvent(new ContextRefreshedEvent(context));
+//                    listener.onApplicationEvent(new ContextRefreshedEvent(context));
 
                 }
             }
