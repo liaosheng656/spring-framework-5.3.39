@@ -1,6 +1,7 @@
 package com.af.config;
 
 import com.af.condition.MyCondition;
+import com.af.service.OrderService;
 import com.af.service.StudentService;
 import org.springframework.context.annotation.*;
 
@@ -29,6 +30,14 @@ public class MyConfig {
     @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
     @Bean
     public static StudentService studentService7(){
+        System.out.println("studentService7被执行");
+        return new StudentService();
+    }
+
+    @Bean
+    //相关的bean，如果设置了@Primary，优先级会变高
+    @Primary
+    public StudentService studentService7(OrderService orderService){
         System.out.println("studentService7被执行");
         return new StudentService();
     }

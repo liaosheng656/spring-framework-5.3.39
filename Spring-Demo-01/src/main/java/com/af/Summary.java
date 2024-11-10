@@ -1,10 +1,12 @@
 package com.af;
 
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
+import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.core.type.AnnotationMetadata;
+import com.af.beanFactoryPostProcessor.MyConfigurationClassPostProcessor;
 
 
 /**
@@ -26,12 +28,23 @@ public class Summary {
          *{@link ClassPathScanningCandidateComponentProvider#isCandidateComponent(AnnotatedBeanDefinition beanDefinition)}
          **/
 
+        //核心创建bean、循环依赖
+        /**
+         * 创建bean的核心方法
+         * {@link org.springframework.beans.factory.support.AbstractBeanFactory#doGetBean}
+         * {@link  org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#createBean(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Object[])}
+         */
         /**
          * bean生命周期
          *   1、BeanFactory.getBean(beanName)-->
          *   2、FactoryBean不会实例化-->填充属性(.getObject())-->FactoryBean初始化后-->
          *   3、普通bean-->bean实例化-->
          *     3.1、实例化-->构造方法/实例化选择
+         *     @see AutowiredAnnotationBeanPostProcessor#determineCandidateConstructors(Class, String)
+         *     寻找bean实例化的构造方法（优先级顺序）
+         *       3.1.1、优先使用@Autowired(required = true)的构造方法
+         *       3.1.2、使用BeanDefinition定义好的构造参数 {@link MyConfigurationClassPostProcessor#postProcessBeanDefinitionRegistry}
+         *       3.1.3、使用无参构造方法
          *   4、判断是否依赖其他类/bean-->先创建依赖的bean-->可能存在循环依赖-->
          *     4.1、循环依赖解决
          *   5、一些Aware回调-->
