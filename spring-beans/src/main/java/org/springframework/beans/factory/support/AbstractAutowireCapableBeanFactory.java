@@ -1231,6 +1231,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		boolean resolved = false;
 		boolean autowireNecessary = false;
 		if (args == null) {
+            //构造函数参数锁
 			synchronized (mbd.constructorArgumentLock) {
 				if (mbd.resolvedConstructorOrFactoryMethod != null) {
 					resolved = true;
@@ -1248,19 +1249,31 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// Candidate constructors for autowiring?
+        //有没有@Autowire修饰的构造方法或选择构造方法
+        //寻找bean实例化的构造方法
+        /**
+         * 1、优先使用@Autowired(required = true)的构造方法
+         * 2、使用BeanDefinition定义的构造参数
+         * 3、使用无参构造方法
+         */
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 		if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
+                //如果BeanDefinition定义了构造参数则实例化指定的构造参数方法
+                //@Autowired(required = true)的构造方法优先
 				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args)) {
+            //
 			return autowireConstructor(beanName, mbd, ctors, args);
 		}
 
 		// Preferred constructors for default construction?
+        //如果默认构造的首选构造函数？
 		ctors = mbd.getPreferredConstructors();
 		if (ctors != null) {
 			return autowireConstructor(beanName, mbd, ctors, null);
 		}
 
 		// No special handling: simply use no-arg constructor.
+        //使用无参构造方法-实例化
 		return instantiateBean(beanName, mbd);
 	}
 
@@ -1333,7 +1346,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		if (beanClass != null && hasInstantiationAwareBeanPostProcessors()) {
 			for (SmartInstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().smartInstantiationAware) {
-				Constructor<?>[] ctors = bp.determineCandidateConstructors(beanClass, beanName);
+				//寻找bean实例化的构造方法
+                Constructor<?>[] ctors = bp.determineCandidateConstructors(beanClass, beanName);
 				if (ctors != null) {
 					return ctors;
 				}
