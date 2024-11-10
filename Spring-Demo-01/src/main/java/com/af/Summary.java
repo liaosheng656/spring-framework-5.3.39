@@ -1,12 +1,16 @@
 package com.af;
 
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
+import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.core.type.AnnotationMetadata;
 import com.af.beanFactoryPostProcessor.MyConfigurationClassPostProcessor;
+import org.springframework.beans.factory.support.AbstractBeanFactory;
+import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
 
 
 /**
@@ -31,8 +35,8 @@ public class Summary {
         //核心创建bean、循环依赖
         /**
          * 创建bean的核心方法
-         * {@link org.springframework.beans.factory.support.AbstractBeanFactory#doGetBean}
-         * {@link  org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#createBean(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Object[])}
+         * {@link AbstractBeanFactory#doGetBean}
+         * {@link  AbstractAutowireCapableBeanFactory#createBean(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Object[])}
          */
         /**
          * bean生命周期
@@ -45,8 +49,18 @@ public class Summary {
          *       3.1.1、优先使用@Autowired(required = true)的构造方法
          *       3.1.2、使用BeanDefinition定义好的构造参数 {@link MyConfigurationClassPostProcessor#postProcessBeanDefinitionRegistry}
          *       3.1.3、使用无参构造方法
-         *   4、判断是否依赖其他类/bean-->先创建依赖的bean-->可能存在循环依赖-->
+         *   4、实例化/属性填充的过程中-判断是否依赖其他类/bean-->先创建依赖的bean-->可能存在循环依赖-->
          *     4.1、循环依赖解决
+         *        @see AbstractBeanFactory#doGetBean
+         *        //（A）bean使用有参构造参数实例化时-解析构造方法上的参数param
+         *        4.1.1、{@link org.springframework.beans.factory.support.ConstructorResolver#createArgumentArray}
+         *        //先判断requestingBeanName是否为懒加载，如果懒加载则返回一个代理对象
+         *        //bean使用有参构造参数实例化时-寻找有没有这个bean，没有就创建（param参数）bean-最后来到这里-getBean(param)
+         *        4.1.2、{@link DependencyDescriptor#resolveCandidate(String, Class, BeanFactory)}
+         *        4.1.3、调用beanFactory.getBean(param)方法，如果已经有这个bean，则返回
+         *        4.1.4、如果没有这个（param）bean，则创建又走bean的生命周期
+         *        4.1.5、如果发现（param）也依赖（A），那凉凉，（A）和（param）循环依赖都无法实例化，报错
+         *
          *   5、一些Aware回调-->
          *   6、Bean初始化前-->initializeBean初始化回调-->初始化方法-->Bean初始化后-->注册销毁方法-->加入单例池中-->
          *   7、销毁前调用销毁方法-->bean销毁-->容器销毁
