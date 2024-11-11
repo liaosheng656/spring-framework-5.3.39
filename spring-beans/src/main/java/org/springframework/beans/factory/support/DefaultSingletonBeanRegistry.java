@@ -234,6 +234,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
                 //准备开始创建bean，所以把bean名字设置进去，说明这个bean正在创建
+                //这里可能跑出循环依赖异常
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
@@ -366,6 +367,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void beforeSingletonCreation(String beanName) {
 		if (!this.inCreationCheckExclusions.contains(beanName) && !this.singletonsCurrentlyInCreation.add(beanName)) {
+            System.out.println("【循环依赖】出现循环依赖了，singletonsCurrentlyInCreation="+singletonsCurrentlyInCreation);
 			throw new BeanCurrentlyInCreationException(beanName);
 		}
 	}

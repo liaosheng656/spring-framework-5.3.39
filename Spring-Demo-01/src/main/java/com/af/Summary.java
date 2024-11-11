@@ -5,12 +5,14 @@ import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.DefaultSingletonBeanRegistry;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.core.type.AnnotationMetadata;
 import com.af.beanFactoryPostProcessor.MyConfigurationClassPostProcessor;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
+import com.af.service.dependent.DependsOnConfig;
 
 
 /**
@@ -50,7 +52,7 @@ public class Summary {
          *       3.1.2、使用BeanDefinition定义好的构造参数 {@link MyConfigurationClassPostProcessor#postProcessBeanDefinitionRegistry}
          *       3.1.3、使用无参构造方法
          *   4、实例化/属性填充的过程中-判断是否依赖其他类/bean-->先创建依赖的bean-->可能存在循环依赖-->
-         *     4.1、循环依赖解决
+         *     4.1、构造方法-循环依赖
          *        @see AbstractBeanFactory#doGetBean
          *        //（A）bean使用有参构造参数实例化时-解析构造方法上的参数param
          *        4.1.1、{@link org.springframework.beans.factory.support.ConstructorResolver#createArgumentArray}
@@ -60,6 +62,15 @@ public class Summary {
          *        4.1.3、调用beanFactory.getBean(param)方法，如果已经有这个bean，则返回
          *        4.1.4、如果没有这个（param）bean，则创建又走bean的生命周期
          *        4.1.5、如果发现（param）也依赖（A），那凉凉，（A）和（param）循环依赖都无法实例化，报错
+         *        4.1.6、加个@Lazy可以解决构造方法循环依赖
+         *     4.2、@DependsOn-循环依赖
+         *        @see DependsOnConfig
+         *        4.2.1、@DependsOn这个注解只关注了这个注解的值，和一般的感觉不一样，
+         *              产生循环依赖时，根本没有走到实例化那一步
+         *        {@link AbstractBeanFactory#doGetBean}
+         *        {@link DefaultSingletonBeanRegistry#isDependent(String, String)}
+         *        4.2.2、加@Lazy也不能解决DependsOn循环依赖，单方面加@Lazy，启动时直接报错
+         *        4.2.3、双方加@Lazy，只是启动时不报错，真正使用的时候会报错
          *
          *   5、一些Aware回调-->
          *   6、Bean初始化前-->initializeBean初始化回调-->初始化方法-->Bean初始化后-->注册销毁方法-->加入单例池中-->

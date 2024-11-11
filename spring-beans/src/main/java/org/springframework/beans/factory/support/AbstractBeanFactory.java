@@ -330,6 +330,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					for (String dep : dependsOn) {
 						//判断是否互相依赖
 						if (isDependent(beanName, dep)) {
+                            System.out.println("【循环依赖】dependsOn方式循环依赖，dep="+dep);
 							throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 									"Circular depends-on relationship between '" + beanName + "' and '" + dep + "'");
 						}
