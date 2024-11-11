@@ -75,6 +75,8 @@ public class RunSpringDemo {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(RunSpringDemo.class);
         Object bean = context.getBean("&factoryBeanTest01");
         System.out.println(bean);
+        Object bean2 = context.getBean("dependentServiceAa");
+        System.out.println(bean2);
         try{
             Object studentService = context.getBean("studentService");
             if(studentService != null){
