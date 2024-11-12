@@ -1,18 +1,16 @@
 package com.af;
 
+import com.af.service.dependent.AutowiredServiceA;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.DependencyDescriptor;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.DefaultSingletonBeanRegistry;
+import org.springframework.beans.factory.support.*;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
 import org.springframework.core.type.AnnotationMetadata;
 import com.af.beanFactoryPostProcessor.MyConfigurationClassPostProcessor;
-import org.springframework.beans.factory.support.AbstractBeanFactory;
-import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
 import com.af.service.dependent.DependsOnConfig;
 
 
@@ -73,6 +71,10 @@ public class Summary {
          *        4.2.2、加@Lazy也不能解决DependsOn循环依赖，单方面加@Lazy，启动时直接报错
          *        4.2.3、双方加@Lazy，只是启动时不报错，真正使用的时候会报错
          *        4.2.4、，如果不是构造方法，那么@Lazy要加到参数中才能效果-解决循环依赖
+         *     4.3、属性级别循环依赖{@link AutowiredServiceA}
+         *        4.3.1、为循环依赖创建早期对象-解决循环依赖关键
+         *          @see AbstractAutowireCapableBeanFactory#getEarlyBeanReference(String, RootBeanDefinition, Object)
+         *        4.3.2、也可以用@Lazy解决
          *
          *   5、一些Aware回调-->
          *   6、Bean初始化前-->initializeBean初始化回调-->初始化方法-->Bean初始化后-->注册销毁方法-->加入单例池中-->
