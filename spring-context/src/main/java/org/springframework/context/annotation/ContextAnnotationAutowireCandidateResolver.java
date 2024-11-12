@@ -48,6 +48,16 @@ import org.springframework.util.Assert;
  */
 public class ContextAnnotationAutowireCandidateResolver extends QualifierAnnotationAutowireCandidateResolver {
 
+    /**
+     * 判断是不是有@Lazy注解
+     * 注意判断是否构造方法上有@Lazy注解
+     * 或方法请求参数有@Lazy注解
+     * 或返回的方法类型为void
+     * 如果判断有@Lazy注解，则后构建一个代理对象返回
+     * @param descriptor the descriptor for the target method parameter or field
+     * @param beanName the name of the bean that contains the injection point
+     * @return
+     */
 	@Override
 	@Nullable
 	public Object getLazyResolutionProxyIfNecessary(DependencyDescriptor descriptor, @Nullable String beanName) {
@@ -55,6 +65,7 @@ public class ContextAnnotationAutowireCandidateResolver extends QualifierAnnotat
 	}
 
 	protected boolean isLazy(DependencyDescriptor descriptor) {
+        //获取参数或属性字段的注解
 		for (Annotation ann : descriptor.getAnnotations()) {
 			Lazy lazy = AnnotationUtils.getAnnotation(ann, Lazy.class);
 			if (lazy != null && lazy.value()) {
@@ -63,6 +74,7 @@ public class ContextAnnotationAutowireCandidateResolver extends QualifierAnnotat
 		}
 		MethodParameter methodParam = descriptor.getMethodParameter();
 		if (methodParam != null) {
+            //获取方法，看看有无返回类型，如果是构造方法返回是null，或者是void类型
 			Method method = methodParam.getMethod();
 			if (method == null || void.class == method.getReturnType()) {
 				Lazy lazy = AnnotationUtils.getAnnotation(methodParam.getAnnotatedElement(), Lazy.class);

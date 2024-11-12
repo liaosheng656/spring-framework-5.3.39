@@ -15,12 +15,11 @@ public class DependentServiceA {
 //    private DependentServiceB dependentServiceB;
 
     public DependentServiceA (){
-
     }
 
     /**
      * 构造方法循环依赖
-     * 加个@Lazy可以解决循环依赖
+     * 在先加载的bean上加个@Lazy可以解决循环依赖
      */
     @Lazy
     @Autowired
