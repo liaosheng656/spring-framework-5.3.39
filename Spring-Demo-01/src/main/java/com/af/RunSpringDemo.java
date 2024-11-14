@@ -4,6 +4,7 @@ package com.af;
 //import lombok.extern.slf4j.Slf4j;
 import com.af.annotation.MyAnnotation;
 import com.af.event.ApplicationContextEventTest01;
+import com.af.factoryBean.MyMapper;
 import com.af.service.HelloService;
 import com.af.service.PerSonService;
 import com.af.service.StudentService;
@@ -76,7 +77,10 @@ public class RunSpringDemo {
         Object bean = context.getBean("&factoryBeanTest01");
         System.out.println(bean);
         Object bean2 = context.getBean("dependentServiceAa");
+        MyMapper bean3 = (MyMapper) context.getBean("factoryBeanTest01");
+        String myMapper = bean3.test01("MyMapper");
         System.out.println(bean2);
+        System.out.println(myMapper);
         try{
             Object studentService = context.getBean("studentService");
             if(studentService != null){
