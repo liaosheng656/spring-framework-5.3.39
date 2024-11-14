@@ -413,8 +413,16 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 		return (candidateConstructors.length > 0 ? candidateConstructors : null);
 	}
 
+    /**
+     * 属性填充时，查询 @Autowired(required = true)注解属性-解析-创建依赖的bean
+     * @param pvs the property values that the factory is about to apply (never {@code null})
+     * @param bean the bean instance created, but whose properties have not yet been set
+     * @param beanName the name of the bean
+     * @return
+     */
 	@Override
 	public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) {
+        //属性填充时，查询 @Autowired(required = true)注解属性-解析-创建依赖的bean
 		InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);
 		try {
 			metadata.inject(bean, beanName, pvs);
@@ -709,6 +717,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 			}
 			if (value != null) {
 				ReflectionUtils.makeAccessible(field);
+                //把属性设置进去
 				field.set(bean, value);
 			}
 		}

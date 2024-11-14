@@ -1,6 +1,7 @@
 package com.af;
 
 import com.af.service.dependent.AutowiredServiceA;
+import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
@@ -12,6 +13,9 @@ import org.springframework.context.annotation.ContextAnnotationAutowireCandidate
 import org.springframework.core.type.AnnotationMetadata;
 import com.af.beanFactoryPostProcessor.MyConfigurationClassPostProcessor;
 import com.af.service.dependent.DependsOnConfig;
+import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
+import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.beans.PropertyValues;
 
 
 /**
@@ -37,19 +41,29 @@ public class Summary {
         /**
          * 创建bean的核心方法
          * {@link AbstractBeanFactory#doGetBean}
+         * FactoryBean 处理
+         * {@link AbstractBeanFactory#getObjectForBeanInstance(Object, String, String, RootBeanDefinition)}
          * {@link  AbstractAutowireCapableBeanFactory#createBean(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Object[])}
          */
         /**
          * bean生命周期
          *   1、BeanFactory.getBean(beanName)-->
+         *      @see  AbstractBeanFactory#doGetBean
          *   2、FactoryBean不会实例化-->填充属性(.getObject())-->FactoryBean初始化后-->
+         *      @see AbstractBeanFactory#getObjectForBeanInstance(Object, String, String, RootBeanDefinition)
          *   3、普通bean-->bean实例化-->
+         *      @see AbstractAutowireCapableBeanFactory#createBean(String, RootBeanDefinition, Object[])
          *     3.1、实例化-->构造方法/实例化选择
-         *     @see AutowiredAnnotationBeanPostProcessor#determineCandidateConstructors(Class, String)
+         *      @see AbstractAutowireCapableBeanFactory#createBeanInstance(String, RootBeanDefinition, Object[])
+         *      @see AutowiredAnnotationBeanPostProcessor#determineCandidateConstructors(Class, String)
          *     寻找bean实例化的构造方法（优先级顺序）
          *       3.1.1、优先使用@Autowired(required = true)的构造方法
-         *       3.1.2、使用BeanDefinition定义好的构造参数 {@link MyConfigurationClassPostProcessor#postProcessBeanDefinitionRegistry}
+         *       3.1.2、使用BeanDefinition定义好的构造参数
+         *          @see MyConfigurationClassPostProcessor#postProcessBeanDefinitionRegistry
          *       3.1.3、使用无参构造方法
+        *     3.2、属性填充
+         *      @see AbstractAutowireCapableBeanFactory#populateBean(String, RootBeanDefinition, BeanWrapper)
+         *
          *   4、实例化/属性填充的过程中-判断是否依赖其他类/bean-->先创建依赖的bean-->可能存在循环依赖-->
          *     4.1、构造方法-循环依赖，@Lazy核心{@link ContextAnnotationAutowireCandidateResolver#getLazyResolutionProxyIfNecessary(DependencyDescriptor, String)}
          *        @see AbstractBeanFactory#doGetBean
@@ -75,6 +89,16 @@ public class Summary {
          *        4.3.1、为循环依赖创建早期对象-解决循环依赖关键
          *          @see AbstractAutowireCapableBeanFactory#getEarlyBeanReference(String, RootBeanDefinition, Object)
          *        4.3.2、也可以用@Lazy解决
+         *        4.3.3、（未涉及AOP）普通的循环依赖一般二级缓存可以解决，不涉及代理，在三级缓存中会涉及是否进行代理判断
+         *          4.3.3.1、一级缓存：单例池，二级缓存：早期对象（未完整的bean），三级缓存：一段逻辑，是否要进行代理或AOP代理
+         *        4.3.3、填充/设置属性（如果A<--->B）
+         *          4.3.3.1、先创建A实例（实例化的构造方法会缓存起来的），设置A正在创建，填充属性时，发现依赖B，
+         *          4.3.3.2、然后创建B实例，设置B正在创建，填充属性时，发现依赖A，这时单例池中，没有A和B，将实例B存入二级（早期对象）缓存
+         *          4.3.3.3、然后又去准备创建A，此时缓存中已经存在A的实例构造方法，A实例化，发现A在创建中，将实例A存入二级（早期对象）缓存，
+         *          4.3.3.4、发现A依赖B，去单项池获取B，获取不到，去二级缓存获取B获取到了，然后看看
+         *        @see AutowiredAnnotationBeanPostProcessor.AutowiredFieldElement#inject(Object, String, PropertyValues)
+         *        4
+         *
          *
          *   5、一些Aware回调-->
          *   6、Bean初始化前-->initializeBean初始化回调-->初始化方法-->Bean初始化后-->注册销毁方法-->加入单例池中-->

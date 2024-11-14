@@ -26,7 +26,7 @@ public class TestCGLib implements MethodInterceptor {
         System.out.println("Before method invocation: " + method.getName());
 
         //这里写死，其实MyMapper是接口，接口代理，因为没有
-        if(args[0].toString().equals("MyMapper")){
+        if(args.length > 0 && args[0].toString().equals("MyMapper")){
             return "intercept-调用成功";
         }
 
