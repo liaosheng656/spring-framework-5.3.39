@@ -447,6 +447,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return result;
 	}
 
+    /**
+     *
+     * @param existingBean the existing bean instance
+     * @param beanName the name of the bean, to be passed to it if necessary
+     * (only passed to {@link BeanPostProcessor BeanPostProcessors};
+     * can follow the {@link #ORIGINAL_INSTANCE_SUFFIX} convention in order to
+     * enforce the given instance to be returned, i.e. no proxies etc)
+     * @return
+     * @throws BeansException
+     */
+    //bean初始化之后-这里就包含了AOP那个BeanPostProcessors
 	@Override
 	public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName)
 			throws BeansException {

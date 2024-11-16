@@ -1,6 +1,17 @@
 package com.af;
 
 import com.af.service.dependent.AutowiredServiceA;
+import org.aopalliance.intercept.MethodInvocation;
+import org.aspectj.weaver.tools.JoinPointMatch;
+import org.springframework.aop.TargetSource;
+import org.springframework.aop.aspectj.AbstractAspectJAdvice;
+import org.springframework.aop.aspectj.AspectJAfterAdvice;
+import org.springframework.aop.aspectj.AspectJAfterThrowingAdvice;
+import org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator;
+import org.springframework.aop.framework.adapter.MethodBeforeAdviceInterceptor;
+import org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator;
+import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
+import org.springframework.aop.interceptor.ExposeInvocationInterceptor;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
@@ -17,6 +28,12 @@ import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostP
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
+import  com.af.aop.AopAspect;
+import  org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.framework.ReflectiveMethodInvocation;
+import org.springframework.aop.framework.adapter.AfterReturningAdviceInterceptor;
+
+import java.util.List;
 
 
 /**
@@ -115,10 +132,51 @@ public class Summary {
          *            答：因为B中的属性A和A是存在引用关系的，但后续A创建bean的流程走完，那A为完整的bean后，
          *               那B中的A属性指向自然就是完整的bean对象了，而B成为完整的bean，那么同理A中的B属性指向自然就是完整的bean对象了
          *
-         *
          *   5、一些Aware回调-->
-         *   6、Bean初始化前-->initializeBean初始化回调-->初始化方法-->Bean初始化后-->注册销毁方法-->加入单例池中-->
-         *   7、销毁前调用销毁方法-->bean销毁-->容器销毁
+         *   6、Bean初始化前-->initializeBean初始化回调-->初始化方法-->
+         *   7、Bean初始化后-->
+         *      @see AbstractAutowireCapableBeanFactory#applyBeanPostProcessorsAfterInitialization(Object, String)
+         *      @see AbstractAutoProxyCreator#postProcessAfterInitialization(Object, String)
+         *     7.1、先看看有没有AOP配置，如果有再看看这个bean是否需要AOP，查看类上的方法有哪个符合切点规则 {@link AopAspect#aopCut()}
+         *     7.2、符合切点规则（一个AOP切面/配置类可以多个切点），看看切点应用于哪种（前置/后置/环绕等）通知（通知也可以同时配置多个切点）
+         *     7.3、方法符合切点规则，并且切点有被（前置/后置/环绕等）通知应用，那么加入一个默认的通知，默认的通知里面加入一个拦截器
+         *          @see AspectJAwareAdvisorAutoProxyCreator#extendAdvisors(List)
+         *          默认的通知中加入了一个拦截器，拦截器用于后续AOP的执行
+         *          @see ExposeInvocationInterceptor#ADVISOR
+         *          AOP最后调用/实现
+         *          @see ExposeInvocationInterceptor#invoke(MethodInvocation)
+         *     7.4、通知排序
+         *          @see AbstractAdvisorAutoProxyCreator#sortAdvisors(List)
+         *     7.5、设置/构造通知，创建代理对象-返回代理对象
+         *          @see AbstractAutoProxyCreator#createProxy(Class, String, Object[], TargetSource)
+         *          @see ProxyFactory#getProxy(java.lang.ClassLoader)
+         *     7.6、AOP通知执行顺序，可以测试{@link AopAspect}
+         *          代理对象调用方法-->
+         *          默认的通知-->
+         *              @see ExposeInvocationInterceptor#invoke(MethodInvocation)
+         *  重要        {@link ReflectiveMethodInvocation#proceed()}
+         *          环绕-->调用环绕通知，在环绕通知中，调用joinPoint.proceed()，通知重新走入循环/递归调用流程中，调用下一通知
+         *              @see ExposeInvocationInterceptor#invoke(MethodInvocation)
+         *          前置-->调用环绕通知，递归调用下一通知
+         *              @see MethodBeforeAdviceInterceptor#invoke(MethodInvocation)
+         *          后置-->递归调用下一通知，但后置通知调用会放到finally{}代码块中，所以最后无论是否发生异常都会调用
+         *              @see AspectJAfterAdvice#invoke(MethodInvocation)
+         *          返回-->递归调用下一通知，再调用返回通知，所以如果发生异常，则返回通知不调用
+         *              @see AfterReturningAdviceInterceptor#invoke(MethodInvocation)
+         *          异常-->调用目标方法，try-catch，如果发生异常，会调用异常通知
+         *              @see AspectJAfterThrowingAdvice#invoke(MethodInvocation)
+         *              发生异常时：
+         *              @see AbstractAspectJAdvice#invokeAdviceMethod(JoinPointMatch, Object, Throwable)
+         *          目标方法-->
+         *              @see org.springframework.aop.framework.CglibAopProxy.CglibMethodInvocation#invokeJoinpoint()
+         *          如果调用没有发生异常
+         *              目标方法-->返回通知-->后置通知-->后环绕通知-->流程完毕
+         *          如果调用发生异常
+         *              目标方法异常-->异常通知-->后置通知-->抛出异常
+         *
+         *
+         *   8、注册销毁方法-->加入单例池中-->
+         *   9、销毁前调用销毁方法-->bean销毁-->容器销毁
          */
 
         /**

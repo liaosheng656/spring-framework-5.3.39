@@ -44,6 +44,7 @@ public abstract class AspectJProxyUtils {
 	 * @return {@code true} if an {@link ExposeInvocationInterceptor} was added to the list,
 	 * otherwise {@code false}
 	 */
+    //加入默认的通知
 	public static boolean makeAdvisorChainAspectJCapableIfNecessary(List<Advisor> advisors) {
 		// Don't add advisors to an empty list; may indicate that proxying is just not required
 		if (!advisors.isEmpty()) {
@@ -57,6 +58,7 @@ public abstract class AspectJProxyUtils {
 				}
 			}
 			if (foundAspectJAdvice && !advisors.contains(ExposeInvocationInterceptor.ADVISOR)) {
+                //加入默认的通知
 				advisors.add(0, ExposeInvocationInterceptor.ADVISOR);
 				return true;
 			}

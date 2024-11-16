@@ -54,7 +54,10 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	@Nullable
 	private BeanFactoryAdvisorRetrievalHelper advisorRetrievalHelper;
 
-
+    /**
+     * BeanFactoryAware回调
+     * @param beanFactory
+     */
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
 		super.setBeanFactory(beanFactory);
@@ -106,9 +109,13 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
         //找AOP，@Aspect对应的类，和对前置、后置、环绕等通知进行封装
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
+        //查看类上的方法有哪个符合切点规则
+        //符合切点规则（一个AOP切面/配置类可以多个切点），看看切点应用于哪种（前置/后置/环绕等）通知（通知也可以同时配置多个切点）
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
+        //方法符合切点规则，并且切点有被（前置/后置/环绕等）通知应用，那么加入一个默认的通知，默认的通知里面加入一个拦截器
 		extendAdvisors(eligibleAdvisors);
 		if (!eligibleAdvisors.isEmpty()) {
+            //排序
 			eligibleAdvisors = sortAdvisors(eligibleAdvisors);
 		}
 		return eligibleAdvisors;

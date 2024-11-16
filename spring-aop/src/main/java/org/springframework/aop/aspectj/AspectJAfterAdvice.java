@@ -49,6 +49,7 @@ public class AspectJAfterAdvice extends AbstractAspectJAdvice
 			return mi.proceed();
 		}
 		finally {
+            //无论目标方法是否调用异常，都会调用之后的方法after(JoinPoint joinPoint)
 			invokeAdviceMethod(getJoinPointMatch(), null, null);
 		}
 	}
