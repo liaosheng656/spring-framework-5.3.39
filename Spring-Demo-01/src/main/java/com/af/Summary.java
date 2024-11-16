@@ -150,7 +150,7 @@ public class Summary {
          *     7.5、设置/构造通知，创建代理对象-返回代理对象
          *          @see AbstractAutoProxyCreator#createProxy(Class, String, Object[], TargetSource)
          *          @see ProxyFactory#getProxy(java.lang.ClassLoader)
-         *     7.6、AOP通知执行顺序，可以测试{@link AopAspect}
+         *     7.6、AOP通知执行顺序，可以测试{@link AopAspect}，单切面（类）中，加入@Order(3)不影响通知执行顺序
          *          代理对象调用方法-->
          *          默认的通知-->
          *              @see ExposeInvocationInterceptor#invoke(MethodInvocation)
