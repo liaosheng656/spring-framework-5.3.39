@@ -1,6 +1,7 @@
 package com.af;
 
 import com.af.service.dependent.AutowiredServiceA;
+import com.af.service.initialize.InitializeServiceA;
 import org.aopalliance.intercept.MethodInvocation;
 import org.aspectj.weaver.tools.JoinPointMatch;
 import org.springframework.aop.TargetSource;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.support.*;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.type.AnnotationMetadata;
 import com.af.beanFactoryPostProcessor.MyConfigurationClassPostProcessor;
 import com.af.service.dependent.DependsOnConfig;
@@ -133,24 +135,32 @@ public class Summary {
          *               那B中的A属性指向自然就是完整的bean对象了，而B成为完整的bean，那么同理A中的B属性指向自然就是完整的bean对象了
          *
          *   5、一些Aware回调-->
-         *   6、Bean初始化前-->initializeBean初始化回调-->初始化方法-->
-         *   7、Bean初始化后-->
+         *      @see AbstractAutowireCapableBeanFactory#invokeAwareMethods(String, Object)
+         *   6、Bean初始化前-->
+         *      @see AbstractAutowireCapableBeanFactory#applyBeanPostProcessorsBeforeInitialization(Object, String)
+         *      其他也会调用@PostConstruct注解的方法
+         *   7、initializeBean初始化回调-->
+         *      @see InitializeServiceA#afterPropertiesSet()
+         *   8、初始化方法-->
+         *      @see AbstractAutowireCapableBeanFactory#invokeInitMethods(String, Object, RootBeanDefinition)
+         *      如果指定了init方法则会调用，可以在bean定义中设置
+         *   9、Bean初始化后（正常情况AOP）-->
          *      @see AbstractAutowireCapableBeanFactory#applyBeanPostProcessorsAfterInitialization(Object, String)
          *      @see AbstractAutoProxyCreator#postProcessAfterInitialization(Object, String)
-         *     7.1、先看看有没有AOP配置，如果有再看看这个bean是否需要AOP，查看类上的方法有哪个符合切点规则 {@link AopAspect#aopCut()}
-         *     7.2、符合切点规则（一个AOP切面/配置类可以多个切点），看看切点应用于哪种（前置/后置/环绕等）通知（通知也可以同时配置多个切点）
-         *     7.3、方法符合切点规则，并且切点有被（前置/后置/环绕等）通知应用，那么加入一个默认的通知，默认的通知里面加入一个拦截器
+         *     9.1、先看看有没有AOP配置，如果有再看看这个bean是否需要AOP，查看类上的方法有哪个符合切点规则 {@link AopAspect#aopCut()}
+         *     9.2、符合切点规则（一个AOP切面/配置类可以多个切点），看看切点应用于哪种（前置/后置/环绕等）通知（通知也可以同时配置多个切点）
+         *     9.3、方法符合切点规则，并且切点有被（前置/后置/环绕等）通知应用，那么加入一个默认的通知，默认的通知里面加入一个拦截器
          *          @see AspectJAwareAdvisorAutoProxyCreator#extendAdvisors(List)
          *          默认的通知中加入了一个拦截器，拦截器用于后续AOP的执行
          *          @see ExposeInvocationInterceptor#ADVISOR
          *          AOP最后调用/实现
          *          @see ExposeInvocationInterceptor#invoke(MethodInvocation)
-         *     7.4、通知排序
+         *     9.4、通知排序
          *          @see AbstractAdvisorAutoProxyCreator#sortAdvisors(List)
-         *     7.5、设置/构造通知，创建代理对象-返回代理对象
+         *     9.5、设置/构造通知，创建代理对象-返回代理对象
          *          @see AbstractAutoProxyCreator#createProxy(Class, String, Object[], TargetSource)
          *          @see ProxyFactory#getProxy(java.lang.ClassLoader)
-         *     7.6、AOP通知执行顺序，可以测试{@link AopAspect}，单切面（类）中，加入@Order(3)不影响通知执行顺序
+         *     9.6、AOP通知执行顺序，可以测试{@link AopAspect}，单切面（类）中，加入@Order(3)不影响通知执行顺序
          *          代理对象调用方法-->
          *          默认的通知-->
          *              @see ExposeInvocationInterceptor#invoke(MethodInvocation)
@@ -175,8 +185,13 @@ public class Summary {
          *              目标方法异常-->异常通知-->后置通知-->抛出异常
          *
          *
-         *   8、注册销毁方法-->加入单例池中-->
-         *   9、销毁前调用销毁方法-->bean销毁-->容器销毁
+         *   10、注册销毁方法-->
+         *   11、加入单例池中-->
+         *   12、容器销毁-->
+         *      @see AbstractApplicationContext#close
+         *   13、销毁前调用bean销毁方法-->
+         *      @see InitializeServiceA#end()
+         *   14、bean销毁
          */
 
         /**
