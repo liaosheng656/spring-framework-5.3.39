@@ -16,6 +16,7 @@ import com.af.service.dependent.DependsOnConfig;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.PropertyValues;
+import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
 
 
 /**
@@ -49,7 +50,7 @@ public class Summary {
          * bean生命周期
          *   1、BeanFactory.getBean(beanName)-->
          *      @see  AbstractBeanFactory#doGetBean
-         *   2、FactoryBean不会实例化-->填充属性(.getObject())-->FactoryBean初始化后-->
+         *   2、FactoryBean不会实例化-->填充属性(.getObject())返回-->FactoryBean初始化后-->
          *      @see AbstractBeanFactory#getObjectForBeanInstance(Object, String, String, RootBeanDefinition)
          *   3、普通bean-->bean实例化-->
          *      @see AbstractAutowireCapableBeanFactory#createBean(String, RootBeanDefinition, Object[])
@@ -93,11 +94,26 @@ public class Summary {
          *          4.3.3.1、一级缓存：单例池，二级缓存：早期对象（未完整的bean），三级缓存：一段逻辑，是否要进行代理或AOP代理
          *        4.3.3、填充/设置属性（如果A<--->B）
          *          4.3.3.1、先创建A实例（实例化的构造方法会缓存起来的），设置A正在创建，填充属性时，发现依赖B，
-         *          4.3.3.2、然后创建B实例，设置B正在创建，填充属性时，发现依赖A，这时单例池中，没有A和B，将实例B存入二级（早期对象）缓存
-         *          4.3.3.3、然后又去准备创建A，此时缓存中已经存在A的实例构造方法，A实例化，发现A在创建中，将实例A存入二级（早期对象）缓存，
-         *          4.3.3.4、发现A依赖B，去单项池获取B，获取不到，去二级缓存获取B获取到了，然后看看
-         *        @see AutowiredAnnotationBeanPostProcessor.AutowiredFieldElement#inject(Object, String, PropertyValues)
-         *        4
+         *          4.3.3.2、然后创建B实例，设置B正在创建，填充属性时，发现依赖A，这时单例池中，没有A和B，将实例B（早期对象）存入三级（一段逻辑）缓存
+         *          4.3.3.3、然后又去准备创建A，此时缓存中已经存在A的实例构造方法，A实例化，发现A在创建中，将实例A（早期对象）存入三级（一段逻辑）缓存
+         *          4.3.3.4、发现A依赖B，去单项池获取B，获取不到，去二级缓存获取B获取不到，然后看看第三级缓存，三级缓存就有了
+         *          4.3.3.5、执行三级缓存逻辑，如果要进行代理或AOP，则返回代理对象；如果不用进行代理，则返回B早期对象，B早期对象存入二级早期对象缓存，删除B三级缓存
+         *          4.3.3.6、将返回的B早期/代理对象进行属性填充（然后发现B依赖A，去单项池获取A，获取不到，去二级缓存获取A获取不到，然后看看第三级缓存，三级缓存就有了）
+         *          4.3.3.7、执行三级缓存逻辑，如果要进行代理或AOP，则返回代理对象；如果不用进行代理，则返回A早期对象，A早期对象存入二级早期对象缓存，删除A三级缓存
+         *   重点    4.3.3.8、返回A的早期或代理对象，因为已经获取到A的早期/代理对象，所以就不会再去解析A了，所以跳出循环依赖了
+         *          4.3.3.9、将返回的A的早期或代理对象设置给B，B属性填充完毕
+         *              @see AutowiredAnnotationBeanPostProcessor.AutowiredFieldElement#inject(Object, String, PropertyValues)
+         *          4.3.3.10、然后开始B的初始化initializeBean方法
+         *              @see AbstractAutowireCapableBeanFactory#initializeBean(String, Object, RootBeanDefinition)
+         *          4.3.3.11、如果是普通bean对象即没有出现循环依赖的，如果需要进行AOP，那么会在初始化后调用初始化后方法，实现AOP返回代理对象
+         *                    如果bean已经是代理对象或AOP代理对象，则不会进行AOP了，因为在执行第三级缓存的方法时，已经进行过代理或提前AOP处理
+         *                  @see AbstractAutowireCapableBeanFactory#applyBeanPostProcessorsAfterInitialization(Object, String)
+         *          4.3.3.12、B的bean创建流程完成，此时B的早期对象就已经设置为完整的bean对象了，创建将B的bean存入单例池中，删除二级缓存中的B早期对象
+         *          4.3.3.13、B创建bean完成，返回A的（填充属性流程）把B属性设置值，A再走初始化方法，bean创建流程走完，把完整A对象设置到单例池中
+         *          ============循环依赖解决，A和B都成功创建Bean
+         *          4.3.3.14、可能会问，B的创建Bean流程走完，那A都没有创建完成，怎么能是完整的bean了呢？
+         *            答：因为B中的属性A和A是存在引用关系的，但后续A创建bean的流程走完，那A为完整的bean后，
+         *               那B中的A属性指向自然就是完整的bean对象了，而B成为完整的bean，那么同理A中的B属性指向自然就是完整的bean对象了
          *
          *
          *   5、一些Aware回调-->
