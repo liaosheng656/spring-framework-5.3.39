@@ -14,6 +14,7 @@ import org.springframework.aop.aspectj.AspectJAroundAdvice;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.aop.framework.adapter.AfterReturningAdviceInterceptor;
 import org.springframework.aop.framework.adapter.MethodBeforeAdviceInterceptor;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Annotation;
@@ -45,6 +46,7 @@ public class AopAspect {
      * @see AspectJAroundAdvice#invoke(MethodInvocation)
      */
     @Around("aopCut()")
+    @Order(1)
     public Object testCutAround(ProceedingJoinPoint joinPoint) throws Throwable {
         //请求参数
         Object[] args = joinPoint.getArgs();
@@ -86,6 +88,7 @@ public class AopAspect {
      * @param joinPoint 连接点
      * @see MethodBeforeAdviceInterceptor#invoke(MethodInvocation)
      */
+    @Order(3)
     @Before("aopCut()")
     public void before(JoinPoint joinPoint) {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -102,6 +105,7 @@ public class AopAspect {
      * @see AspectJAfterAdvice#invoke(MethodInvocation)
      */
     @After("aopCut()")
+    @Order(2)
     public void after(JoinPoint joinPoint) {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
