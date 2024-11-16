@@ -145,6 +145,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 				// discovered via reflection in order to support reliable advice ordering across JVM launches.
 				// Specifically, a value of 0 aligns with the default value used in
 				// AspectJPrecedenceComparator.getAspectDeclarationOrder(Advisor).
+                //获取一个排序，AOP通知的排序（默认为0）
 				Advisor advisor = getAdvisor(method, lazySingletonAspectInstanceFactory, 0, aspectName);
 				if (advisor != null) {
 					advisors.add(advisor);
@@ -207,6 +208,15 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	}
 
 
+    /**
+     *
+     * @param candidateAdviceMethod the candidate advice method
+     * @param aspectInstanceFactory the aspect instance factory
+     * @param declarationOrderInAspect AOP通知的排序
+     * @param aspectName the name of the aspect
+     * @return
+     */
+    //获取一个通知
 	@Override
 	@Nullable
 	public Advisor getAdvisor(Method candidateAdviceMethod, MetadataAwareAspectInstanceFactory aspectInstanceFactory,

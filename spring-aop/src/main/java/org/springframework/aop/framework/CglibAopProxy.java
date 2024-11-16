@@ -156,6 +156,13 @@ class CglibAopProxy implements AopProxy, Serializable {
 		return getProxy(null);
 	}
 
+    /**
+     * 代理
+     * @param classLoader the class loader to create the proxy with
+     * (or {@code null} for the low-level proxy facility's default)
+     * @return
+     */
+    //代理
 	@Override
 	public Object getProxy(@Nullable ClassLoader classLoader) {
 		if (logger.isTraceEnabled()) {
@@ -192,6 +199,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 			enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
 			enhancer.setStrategy(new ClassLoaderAwareGeneratorStrategy(classLoader));
 
+            //设置回调方法=======
 			Callback[] callbacks = getCallbacks(rootClass);
 			Class<?>[] types = new Class<?>[callbacks.length];
 			for (int x = 0; x < types.length; x++) {
@@ -331,6 +339,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 			// TODO: small memory optimization here (can skip creation for methods with no advice)
 			for (int x = 0; x < methods.length; x++) {
 				Method method = methods[x];
+                //通知的个数和通知
 				List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, rootClass);
 				fixedCallbacks[x] = new FixedChainStaticTargetInterceptor(
 						chain, this.advised.getTargetSource().getTarget(), this.advised.getTargetClass());

@@ -95,7 +95,7 @@ public class RunSpringDemo {
             Object helloServiceObj = context.getBean("helloService");
             if(helloServiceObj != null){
                 HelloService helloService = (HelloService) helloServiceObj;
-                helloService.HelloServiceTest();
+                helloService.HelloServiceTest("调用一下HelloServiceTest");
             }
             Collection<ApplicationListener<?>> listenerList = context.getApplicationListeners();
             if(listenerList != null){
