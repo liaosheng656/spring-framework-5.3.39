@@ -117,6 +117,9 @@ public class RunSpringDemo {
 //		AFAnnotationConfigApplicationContext context = new AFAnnotationConfigApplicationContext(RunSpringDemo.class);
         System.out.println("finish-333333");
         System.out.println("file.encoding: "+System.getProperty("file.encoding"));
+        //容器销毁
+//        context.destroy();
+        context.close();
     }
 
 }
