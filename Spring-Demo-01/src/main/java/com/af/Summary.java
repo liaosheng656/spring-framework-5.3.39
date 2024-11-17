@@ -14,12 +14,14 @@ import org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreat
 import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
 import org.springframework.aop.interceptor.ExposeInvocationInterceptor;
 import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.TypeConverter;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.*;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -36,6 +38,7 @@ import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.aop.framework.adapter.AfterReturningAdviceInterceptor;
 
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -83,6 +86,13 @@ public class Summary {
          *       3.1.3、使用无参构造方法
         *     3.2、属性填充
          *      @see AbstractAutowireCapableBeanFactory#populateBean(String, RootBeanDefinition, BeanWrapper)
+         *    3.3、属性填充-属性解析-@Autowired和@Resource注入的区别
+         *      3.3.1、@Autowired默认/只能按类型注入
+         *          @see AutowiredAnnotationBeanPostProcessor#postProcessProperties(PropertyValues, Object, String)
+         *          @see DefaultListableBeanFactory#findAutowireCandidates(String, Class, DependencyDescriptor)
+     *          3.3.2、@Resource默认按名字注入，按名字找不到，就按类型找，如果指定名字，则只能按名字找
+     *              @see CommonAnnotationBeanPostProcessor#postProcessProperties(PropertyValues, Object, String)
+     *              @see CommonAnnotationBeanPostProcessor#autowireResource(BeanFactory, CommonAnnotationBeanPostProcessor.LookupElement, String)
          *
          *   4、实例化/属性填充的过程中-判断是否依赖其他类/bean-->先创建依赖的bean-->可能存在循环依赖-->
          *     4.1、构造方法-循环依赖，@Lazy核心{@link ContextAnnotationAutowireCandidateResolver#getLazyResolutionProxyIfNecessary(DependencyDescriptor, String)}
@@ -113,6 +123,7 @@ public class Summary {
          *          4.3.3.1、一级缓存：单例池，二级缓存：早期对象（未完整的bean），三级缓存：一段逻辑，是否要进行代理或AOP代理
          *        4.3.3、填充/设置属性（如果A<--->B）
          *          4.3.3.1、先创建A实例（实例化的构造方法会缓存起来的），设置A正在创建，填充属性时，发现依赖B，
+         *              解析依赖{@link DefaultListableBeanFactory#doResolveDependency(DependencyDescriptor, String, Set, TypeConverter)}
          *          4.3.3.2、然后创建B实例，设置B正在创建，填充属性时，发现依赖A，这时单例池中，没有A和B，将实例B（早期对象）存入三级（一段逻辑）缓存
          *          4.3.3.3、然后又去准备创建A，此时缓存中已经存在A的实例构造方法，A实例化，发现A在创建中，将实例A（早期对象）存入三级（一段逻辑）缓存
          *          4.3.3.4、发现A依赖B，去单项池获取B，获取不到，去二级缓存获取B获取不到，然后看看第三级缓存，三级缓存就有了
