@@ -81,6 +81,10 @@ public class RunSpringDemo {
         String myMapper = bean3.test01("MyMapper");
         System.out.println(bean2);
         System.out.println(myMapper);
+
+        MyMapper bean1 = context.getBean(MyMapper.class);
+        String myMapper1 = bean1.test01("MyMapper");
+        System.out.println(myMapper1);
         try{
             Object studentService = context.getBean("studentService");
             if(studentService != null){
