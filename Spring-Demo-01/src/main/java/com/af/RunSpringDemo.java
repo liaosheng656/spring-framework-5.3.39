@@ -8,6 +8,7 @@ import com.af.factoryBean.MyMapper;
 import com.af.service.HelloService;
 import com.af.service.PerSonService;
 import com.af.service.StudentService;
+import com.af.service.TransactionalService;
 import com.alibaba.fastjson2.JSONObject;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.*;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -31,6 +33,8 @@ import java.util.Collection;
 //@MyAnnotation(init = false)
 @MyAnnotation(init = true)
 @EnableAspectJAutoProxy(proxyTargetClass = true)
+//开始事务-代理曝光
+@EnableTransactionManagement(proxyTargetClass = true)
 public class RunSpringDemo {
 
 	/**
@@ -74,6 +78,11 @@ public class RunSpringDemo {
          */
 		//无配置文件启动
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(RunSpringDemo.class);
+        Object tService = context.getBean("transactionalService");
+        TransactionalService transactionalService = (TransactionalService) tService;
+        //事务测试
+        transactionalService.add();
+
         Object bean = context.getBean("&factoryBeanTest01");
         System.out.println(bean);
         Object bean2 = context.getBean("dependentServiceAa");

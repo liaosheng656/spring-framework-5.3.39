@@ -404,6 +404,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 				}
 			}
 
+            System.out.println("提交事务=================================");
 			commitTransactionAfterReturning(txInfo);
 			return retVal;
 		}
