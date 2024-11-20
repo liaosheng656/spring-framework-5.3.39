@@ -50,7 +50,7 @@ public class RunSpringDemo {
 			System.out.println("内部类MemberRunSpringDemo被调用了");
 		}
 	}
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         /**
          * 扫描逻辑
@@ -78,6 +78,14 @@ public class RunSpringDemo {
          */
 		//无配置文件启动
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(RunSpringDemo.class);
+
+		Object helloServiceObj = context.getBean("helloService");
+		if(helloServiceObj != null){
+			HelloService helloService = (HelloService) helloServiceObj;
+			//AOP测试
+			helloService.HelloServiceTest("调用一下HelloServiceTest");
+		}
+
         Object tService = context.getBean("transactionalService");
         TransactionalService transactionalService = (TransactionalService) tService;
         //事务测试
@@ -105,11 +113,6 @@ public class RunSpringDemo {
 				PerSonService perSonService  = (PerSonService) perSonServiceObj;
 				perSonService.perSonYmlAndProperties();
 			}
-            Object helloServiceObj = context.getBean("helloService");
-            if(helloServiceObj != null){
-                HelloService helloService = (HelloService) helloServiceObj;
-                helloService.HelloServiceTest("调用一下HelloServiceTest");
-            }
             Collection<ApplicationListener<?>> listenerList = context.getApplicationListeners();
             if(listenerList != null){
                 for (ApplicationListener listener:listenerList) {

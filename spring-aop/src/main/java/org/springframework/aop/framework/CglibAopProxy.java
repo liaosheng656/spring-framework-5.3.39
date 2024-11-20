@@ -289,6 +289,13 @@ class CglibAopProxy implements AopProxy, Serializable {
 		}
 	}
 
+	/**
+	 * 设置回调
+	 * AOP默认回调{@link org.springframework.aop.framework.CglibAopProxy.DynamicAdvisedInterceptor#intercept(Object, Method, Object[], MethodProxy)}
+	 * @param rootClass
+	 * @return
+	 * @throws Exception
+	 */
 	private Callback[] getCallbacks(Class<?> rootClass) throws Exception {
 		// Parameters used for optimization choices...
 		boolean isFrozen = this.advised.isFrozen();
@@ -684,6 +691,16 @@ class CglibAopProxy implements AopProxy, Serializable {
 			this.advised = advised;
 		}
 
+		/**
+		 * AOP默认回调这里/拦截器方法
+		 * 设置AOP回调拦截器{@link  org.springframework.aop.framework.CglibAopProxy#getCallbacks(Class)}
+		 * @param proxy
+		 * @param method
+		 * @param args
+		 * @param methodProxy
+		 * @return
+		 * @throws Throwable
+		 */
 		@Override
 		@Nullable
 		public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {

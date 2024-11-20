@@ -38,6 +38,8 @@ import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.aop.framework.adapter.AfterReturningAdviceInterceptor;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
+import java.lang.reflect.Method;
+import org.springframework.cglib.proxy.MethodProxy;
 
 import java.util.List;
 import java.util.Set;
@@ -170,10 +172,11 @@ public class Summary {
          *          @see ExposeInvocationInterceptor#invoke(MethodInvocation)
          *     9.4、通知排序
          *          @see AbstractAdvisorAutoProxyCreator#sortAdvisors(List)
-         *     9.5、设置/构造通知，创建代理对象-返回代理对象
+         * 重要 9.5、设置/构造通知，创建代理对象-返回代理对象
          *          @see AbstractAutoProxyCreator#createProxy(Class, String, Object[], TargetSource)
          *          @see ProxyFactory#getProxy(java.lang.ClassLoader)
          * 重要     设置AOP回调拦截器{@link  org.springframework.aop.framework.CglibAopProxy#getCallbacks(Class)}
+		 * 		   AOP默认回调{@link org.springframework.aop.framework.CglibAopProxy.DynamicAdvisedInterceptor#intercept(Object, Method, Object[], MethodProxy)}
          *     9.6、AOP通知执行顺序，可以测试{@link AopAspect}，单切面（类）中，加入@Order(3)不影响通知执行顺序
          *          代理对象调用方法-->
          *          默认的通知-->
@@ -197,7 +200,9 @@ public class Summary {
          *              目标方法-->返回通知-->后置通知-->后环绕通知-->流程完毕
          *          如果调用发生异常
          *              目标方法异常-->异常通知-->后置通知-->抛出异常
-         *   10、Spring事务
+         *   10、Spring事务（回调和设置回调详见：9.5）
+		 *   	AOP默认回调{@link org.springframework.aop.framework.CglibAopProxy.DynamicAdvisedInterceptor#intercept(Object, Method, Object[], MethodProxy)}
+		 *		{@link ReflectiveMethodInvocation#proceed()}
          *      入口 {@link TransactionInterceptor#invoke(MethodInvocation)}
          *      提交{@link TransactionAspectSupport#commitTransactionAfterReturning(TransactionAspectSupport.TransactionInfo)}
          *
