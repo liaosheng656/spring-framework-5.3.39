@@ -1,5 +1,6 @@
 package com.af;
 
+import com.af.service.TransactionalService;
 import com.af.service.dependent.AutowiredServiceA;
 import com.af.service.initialize.InitializeServiceA;
 import org.aopalliance.intercept.MethodInvocation;
@@ -207,7 +208,11 @@ public class Summary {
          *      真正处理事务入口 {@link TransactionInterceptor#invoke(MethodInvocation)}
 		 *      事务时间是否过期{@link ResourceHolderSupport#getTimeToLiveInSeconds()}
          *      事务提交{@link TransactionAspectSupport#commitTransactionAfterReturning(TransactionAspectSupport.TransactionInfo)}
-         *
+         *      10.1、总结{@link TransactionalService#add()}
+         *          如果后续不需要执行SQL了，并且后续的程序没有报错/发生异常，那么就是存在卡顿或长时间处理不完
+         * 		    那么也是一直在事务中的，设置了超期时间，也没有用的，等后续程序执行完也一样会提交事务
+         *          如果有其他事务在等待这个事务，那得等这个事务释放后才能执行
+         *         如果后续还有SQL要执行，那么超期时间的就有效了，因为执行SQL需要先获取数据库连接，在看看判断超期时间
          *   10、注册销毁方法-->
          *   11、加入单例池中-->
          *   12、容器销毁-->
