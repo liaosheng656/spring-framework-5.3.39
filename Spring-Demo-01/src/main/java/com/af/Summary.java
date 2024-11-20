@@ -40,6 +40,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import java.lang.reflect.Method;
 import org.springframework.cglib.proxy.MethodProxy;
+import org.springframework.transaction.support.ResourceHolderSupport;
 
 import java.util.List;
 import java.util.Set;
@@ -203,8 +204,9 @@ public class Summary {
          *   10、Spring事务（回调和设置回调详见：9.5）
 		 *   	AOP默认回调{@link org.springframework.aop.framework.CglibAopProxy.DynamicAdvisedInterceptor#intercept(Object, Method, Object[], MethodProxy)}
 		 *		{@link ReflectiveMethodInvocation#proceed()}
-         *      入口 {@link TransactionInterceptor#invoke(MethodInvocation)}
-         *      提交{@link TransactionAspectSupport#commitTransactionAfterReturning(TransactionAspectSupport.TransactionInfo)}
+         *      真正处理事务入口 {@link TransactionInterceptor#invoke(MethodInvocation)}
+		 *      事务时间是否过期{@link ResourceHolderSupport#getTimeToLiveInSeconds()}
+         *      事务提交{@link TransactionAspectSupport#commitTransactionAfterReturning(TransactionAspectSupport.TransactionInfo)}
          *
          *   10、注册销毁方法-->
          *   11、加入单例池中-->

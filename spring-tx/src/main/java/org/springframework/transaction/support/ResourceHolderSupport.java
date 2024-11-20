@@ -124,6 +124,7 @@ public abstract class ResourceHolderSupport implements ResourceHolder {
 	 * @return number of seconds until expiration
 	 * @throws TransactionTimedOutException if the deadline has already been reached
 	 */
+	//看看是否过期
 	public int getTimeToLiveInSeconds() {
 		double diff = ((double) getTimeToLiveInMillis()) / 1000;
 		int secs = (int) Math.ceil(diff);
