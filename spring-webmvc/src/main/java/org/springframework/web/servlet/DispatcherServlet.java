@@ -496,6 +496,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * <p>May be overridden in subclasses in order to initialize further strategy objects.
 	 */
 	protected void initStrategies(ApplicationContext context) {
+		logger.info("进入initStrategies方法");
 		initMultipartResolver(context);
 		initLocaleResolver(context);
 		initThemeResolver(context);
@@ -861,6 +862,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	@SuppressWarnings("unchecked")
 	protected <T> List<T> getDefaultStrategies(ApplicationContext context, Class<T> strategyInterface) {
+		logger.info("进入getDefaultStrategies方法");
 		if (defaultStrategies == null) {
 			try {
 				// Load default strategy implementations from properties file.
@@ -1030,6 +1032,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	@SuppressWarnings("deprecation")
 	protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		logger.info("进入doDispatch方法");
 		HttpServletRequest processedRequest = request;
 		HandlerExecutionChain mappedHandler = null;
 		boolean multipartRequestParsed = false;
@@ -1047,6 +1050,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				// Determine handler for the current request.
 				mappedHandler = getHandler(processedRequest);
 				if (mappedHandler == null) {
+					logger.info("mappedHandler为空");
 					noHandlerFound(processedRequest, response);
 					return;
 				}
@@ -1265,6 +1269,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			for (HandlerMapping mapping : this.handlerMappings) {
 				HandlerExecutionChain handler = mapping.getHandler(request);
 				if (handler != null) {
+					logger.info("getHandler方法匹配到了getHandler，name="+handler.getHandler().getClass().getName());
 					return handler;
 				}
 			}

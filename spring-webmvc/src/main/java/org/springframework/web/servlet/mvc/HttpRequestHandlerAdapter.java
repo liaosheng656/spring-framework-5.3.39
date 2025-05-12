@@ -48,7 +48,7 @@ public class HttpRequestHandlerAdapter implements HandlerAdapter {
 	@Nullable
 	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-
+		System.out.println("进入handle方法");
 		((HttpRequestHandler) handler).handleRequest(request, response);
 		return null;
 	}

@@ -56,4 +56,5 @@ settings.gradle.projectsLoaded {
 	}
 }
 include 'Spring-Demo-01'
+include 'Spring-Demo-MVC-01'
 

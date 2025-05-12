@@ -894,7 +894,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	@Override
 	protected final void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
+		logger.info("doGet方法");
 		processRequest(request, response);
 	}
 
